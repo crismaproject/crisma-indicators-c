@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Peter.Kutschera@ait.ac.at, 2014-03-13
-# Time-stamp: "2014-05-21 13:59:55 peter"
+# Time-stamp: "2014-12-01 12:37:36 peter"
 #
 # Tools to access ICMM
 
@@ -46,7 +46,7 @@ class ICMMAccess:
                 self.id = int (match.group(4))
 
     def __repr__ (self):
-        return "endpoint={}, domain={}, clazz={}, id={}".format (self.endpoint, self.domain, self.clazz, self.id)
+        return "endpoint={0}, domain={1}, clazz={2}, id={3}".format (self.endpoint, self.domain, self.clazz, self.id)
 
 
 def getId (clazz, baseUrl=defaultBaseUrl, domain=defaultDomain):
@@ -58,12 +58,12 @@ def getId (clazz, baseUrl=defaultBaseUrl, domain=defaultDomain):
         'limit' :  999999999
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}".format (baseUrl, domain, clazz), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers) 
     # this was the request:
     # print response.url
 
     if response.status_code != 200:
-        raise Exception ( "Error accessing ICMM at {}: {}".format (response.url, response.raise_for_status()))
+        raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.raise_for_status()))
 
     # Depending on the requests-version json might be an field instead of on method
     # print response.json()
@@ -94,10 +94,10 @@ def getNameDescription (wsid, baseUrl=defaultBaseUrl, domain=defaultDomain):
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
 
     if response.status_code != 200:
-        raise Exception ("Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     if response.text is None:
         raise Exception ("No such ICMM WorldState")
     if response.text == "":
@@ -124,10 +124,10 @@ def getBaseWorldstate (wsid, baseCategory="Baseline", baseUrl=defaultBaseUrl, do
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
 
     if response.status_code != 200:
-        raise Exception ("Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     if response.text is None:
         raise Exception ("No such ICMM WorldState")
     if response.text == "":
@@ -163,10 +163,10 @@ def getIndicatorURL (wsid, name, baseUrl=defaultBaseUrl, domain=defaultDomain):
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
 
     if response.status_code != 200:
-        raise Exception ("Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     if response.text is None:
         raise Exception ("No such ICMM WorldState")
     if response.text == "":
@@ -184,9 +184,9 @@ def getIndicatorURL (wsid, name, baseUrl=defaultBaseUrl, domain=defaultDomain):
         for d in worldstate['worldstatedata']:
             if ('categories' in d):
                 for c in d['categories']:
-                    if ((c['$ref'] == "/{}.categories/4".format (domain)) and (d['name'] == name)):
+                    if ((c['$ref'] == "/{0}.categories/4".format (domain)) and (d['name'] == name)):
                         # An indicator value with the given name is already there
-                        ICMMindicatorURL = "{}{}".format (baseUrl, d['$self'])
+                        ICMMindicatorURL = "{0}{1}".format (baseUrl, d['$self'])
     return ICMMindicatorURL
 
 
@@ -207,10 +207,10 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
 
     if response.status_code != 200:
-        raise Exception ("Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     if response.text is None:
         raise Exception ("No such ICMM WorldState")
     if response.text == "":
@@ -222,15 +222,14 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
     # t = time.time() * 1000
     t = datetime.datetime.utcnow().isoformat()
 
-    ICMMindicatorURL = None
     # check if the indicator is already in the ICMM worldstate
     if (worldstate['worldstatedata'] is not None):
         for d in worldstate['worldstatedata']:
             if ('categories' in d):
                 for c in d['categories']:
-                    if ((c['$ref'] == "/{}.categories/4".format (domain)) and (d['name'] == name)):
+                    if ((c['$ref'] == "/{0}.categories/4".format (domain)) and (d['name'] == name)):
                         # An indicator value with the given name is already there - TODO: update value
-                        ICMMindicatorURL = "{}{}".format (baseUrl, d['$self'])
+                        ICMMindicatorURL = "{0}{1}".format (baseUrl, d['$self'])
                         logging.info ("Update indicator found at " + ICMMindicatorURL)
                         data = {
                             '$self': d['$self'],
@@ -241,24 +240,24 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
                         params = {}
                         response = requests.put(ICMMindicatorURL, params=params, headers=headers, data=json.dumps (data)) 
                         if response.status_code != 200:
-                            raise Exception ("Error writing dataitem to ICMM at {}: {}".format (response.url, response.status_code))   
+                            raise Exception ("Error writing dataitem to ICMM at {0}: {1}".format (response.url, response.status_code))   
                         return ICMMindicatorURL    
                         
     # New indicator in this worldstate
     dataitemsId = getId ("dataitems", baseUrl=baseUrl);
         
     data = {
-        "$self": "/{}.dataitems/{}".format (domain, dataitemsId),
+        "$self": "/{0}.dataitems/{1}".format (domain, dataitemsId),
         "id": dataitemsId,
         "name": name,
         "description": description,
         "categories": [
             {
-                "$ref": "/{}.categories/4".format (domain)
+                "$ref": "/{0}.categories/4".format (domain)
                 }
             ],
         "datadescriptor": {
-            "$ref": "/{}.datadescriptors/3".format (domain)
+            "$ref": "/{0}.datadescriptors/3".format (domain)
             },
         "actualaccessinfocontenttype": "application/json",
         "actualaccessinfo": json.dumps (value),
@@ -274,20 +273,119 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
         '$self' : worldstate['$self'],
         'worldstatedata' : wsdata
         }
-    ICMMindicatorURL = "{}/{}.dataitems/{}".format (baseUrl, domain, dataitemsId)
+    ICMMindicatorURL = "{0}/{1}.dataitems/{2}".format (baseUrl, domain, dataitemsId)
 
     # store worldstate back
     params = {}
-    response = requests.put("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (ws)) 
+    response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (ws)) 
 
     # Check why ICMM is not always sending events
-    logging.info ("AddIndicatorToICMM: PUT {}/{}.{}/{} -- DATA = {}".format (baseUrl, domain, "worldstates", wsid, json.dumps (ws).replace ("\n", ""))) 
+    logging.info ("AddIndicatorToICMM: PUT {0}/{1}.{2}/{3} -- DATA = {4}".format (baseUrl, domain, "worldstates", wsid, json.dumps (ws).replace ("\n", ""))) 
 
     if response.status_code != 200:
-        raise Exception ("Error writing worldstate to ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error writing worldstate to ICMM at {0}: {1}".format (response.url, response.status_code))
     # This is now stored in ICMM: response.json()
 
     return ICMMindicatorURL    
+
+def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, domain=defaultDomain):
+    """Add an kpi value 
+
+    wsid: id within ICMM
+    value: indicator-value as json structure
+
+    returns: ICMM indicator URL (dataitem)
+    """
+    # Get worldstate 
+    ICMMkpiURL = None
+    params = {
+        'level' :  2,
+        'fields' : "iccdata,name,actualaccessinfo",
+        'omitNullValues' : 'true',
+        'deduplicate' : 'true'
+        }
+    headers = {'content-type': 'application/json'}
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+
+    if response.status_code != 200:
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
+    if response.text is None:
+        raise Exception ("No such ICMM WorldState")
+    if response.text == "":
+        raise Exception ("No such ICMM WorldState")
+
+    # Depending on the requests-version json might be an field instead of on method
+    worldstate = response.json() if callable (response.json) else response.json
+
+    # t = time.time() * 1000
+    t = datetime.datetime.utcnow().isoformat()
+
+    icc = None
+    # check if there is already a kpi in the ICMM worldstate
+    if ('iccdata' in worldstate):
+        ICMMkpiURL = "{0}{1}".format (baseUrl, worldstate['iccdata']['$self'])
+        iccString = worldstate['iccdata']['actualaccessinfo']
+        icc = json.loads (iccString)
+
+    # now merge data into icc 
+    logging.info ("    icc = {0}".format (icc))
+    logging.info ("    value = {0}".format (value))
+    if icc is None:
+        icc = value
+    else:
+        for group in value:
+            logging.info ("   group = {0}".format (group))
+            if group in icc:
+                for name in value[group]:
+                    logging.info ("   ame = {0}".format(name))
+                    icc[group][name] = value[group][name]
+            else:
+                icc[group] = value[group]
+
+    if ICMMkpiURL is None: 
+        # There where no iccdata
+        # create new dataitem - this will be the new ICMMkpiUrl
+        dataitemsId = getId ("dataitems", baseUrl=baseUrl);
+        data = {
+            "$self": "/{0}.dataitems/{1}".format (domain, dataitemsId),
+            "id": dataitemsId,
+            "name": "ICC Data",
+            "description": "ICC Data by indicator WPS",
+            "lastmodified": t,
+            "datadescriptor": {
+                "$ref": "/{0}.datadescriptors/4".format (domain)
+                },
+            "actualaccessinfocontenttype": "application/json",
+            "actualaccessinfo": json.dumps (icc)
+            }
+        ICMMkpiURL = "{0}{1}".format (baseUrl, data['$self'])
+        logging.info ("ICMMkpiURL = {0}".format (ICMMkpiURL))
+        # store dataitem back
+        params = {}
+        response = requests.put(ICMMkpiURL, params=params, headers=headers, data=json.dumps (data)) 
+        if response.status_code != 200:
+            raise Exception ("Error writing dataitem to ICMM at {0}: {1}".format (response.url, response.status_code))   
+        
+        # update worldstate
+        worldstate['iccdata'] = {
+            '$ref': "/{0}.dataitems/{1}".format (domain, dataitemsId)
+            }
+        response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (worldstate)) 
+        if response.status_code != 200:
+            raise Exception ("Error updateing worldstate referencing new iccdata in ICMM at {0}: {1}".format (response.url, response.status_code))   
+
+    else:
+        # Update iccdata dataitem only - ignore timestamps in worldstate (TODO?)
+        worldstate['iccdata']['actualaccessinfo'] = json.dumps (icc)
+        # store dataitem back
+        params = {}
+        response = requests.put(ICMMkpiURL, params=params, headers=headers, data=json.dumps (worldstate['iccdata'])) 
+        if response.status_code != 200:
+            raise Exception ("Error writing updated iccdata back to ICMM at {0}: {1}".format (response.url, response.status_code))   
+
+    logging.info ("AddKpiToICMM: PUT {0} -- DATA = {1}".format (ICMMkpiURL, json.dumps (icc).replace ("\n", ""))) 
+
+    return ICMMkpiURL    
 
 ##############################
 # Pilot C specific
@@ -307,10 +405,10 @@ def getOOIRef (wsid, category, name=None, baseUrl=defaultBaseUrl, domain=default
         'deduplicate' : 'false'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
 
     if response.status_code != 200:
-        raise Exception ("Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     if response.text is None:
         raise Exception ("No such ICMM WorldState")
     if response.text == "":
@@ -328,12 +426,12 @@ def getOOIRef (wsid, category, name=None, baseUrl=defaultBaseUrl, domain=default
                     try:
                         access = json.loads (d['actualaccessinfo'])
                     except:
-                        raise Exception ("Could not load OOI access information for worldstate {} - illegal JSON string?\n{}\n".format (wsid, d['actualaccessinfo']))
+                        raise Exception ("Could not load OOI access information for worldstate {0} - illegal JSON string?\n{1}\n".format (wsid, d['actualaccessinfo']))
                     try:
                         service = json.loads (d['datadescriptor']['defaultaccessinfo'])
                     except:
-                        raise Exception ("Could not load OOI access information for worldstate {} - illegal JSON string?\n{}\n".format (wsid, d['actualaccessinfo']))
-                    return "{}/{}/{}".format(service['endpoint'], access['resource'], access['id'])
+                        raise Exception ("Could not load OOI access information for worldstate {0} - illegal JSON string?\n{1}\n".format (wsid, d['actualaccessinfo']))
+                    return "{0}/{1}/{2}".format(service['endpoint'], access['resource'], access['id'])
     return None
 
 def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseUrl, domain=defaultDomain):
@@ -353,10 +451,10 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
 
     if response.status_code != 200:
-        raise Exception ("Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     if response.text is None:
         raise Exception ("No such ICMM WorldState")
     if response.text == "":
@@ -370,8 +468,8 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
         for d in worldstate['worldstatedata']:
             if ('categories' in d):
                 for c in d['categories']:
-                    if ((c['$ref'] == "/{}.categories/3".format (domain)) and (d['name'] == name)):
-                        ICMMindicatorURL = "{}{}".format (baseUrl, d['$self'])
+                    if ((c['$ref'] == "/{0}.categories/3".format (domain)) and (d['name'] == name)):
+                        ICMMindicatorURL = "{0}{1}".format (baseUrl, d['$self'])
                         return ICMMindicatorURL
                         
     # not found, do some work...
@@ -383,17 +481,17 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
     t = datetime.datetime.utcnow().isoformat()
 
     data = {
-        "$self": "/{}.dataitems/{}".format (domain, dataitemsId),
+        "$self": "/{0}.dataitems/{1}".format (domain, dataitemsId),
         "id": dataitemsId,
         "name": name,
         "description": description,
         "categories": [
             {
-                "$ref": "/{}.categories/3".format (domain)
+                "$ref": "/{0}.categories/3".format (domain)
             }
         ],
         "datadescriptor": {
-            "$ref": "/{}.datadescriptors/1".format (domain)
+            "$ref": "/{0}.datadescriptors/1".format (domain)
             },
         "actualaccessinfocontenttype": "URL",
         "actualaccessinfo": ooiref,
@@ -407,21 +505,22 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
 
     # store worldstate back
     params = {}
-    response = requests.put("{}/{}.{}/{}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (worldstate)) 
+    response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (worldstate)) 
 
     # Check why ICMM is not always sending events
     #logging.info ("AddIndicatorToICMM: PUT {}/{}.{}/{} -- DATA = {}".format (baseUrl, domain, "worldstates", wsid, json.dumps (worldstate).replace ("\n", "")))
 
     if response.status_code != 200:
-        raise Exception ("Error writing worldstate to ICMM at {}: {}".format (response.url, response.raise_for_status()))
+        raise Exception ("Error writing worldstate to ICMM at {0}: {1}".format (response.url, response.raise_for_status()))
     
     # That is now stored in ICMM: response.json()
 
-    ICMMindicatorURL = "{}/{}.dataitems/{}".format (baseUrl, domain, dataitemsId)
+    ICMMindicatorURL = "{0}/{1}.dataitems/{2}".format (baseUrl, domain, dataitemsId)
     return ICMMindicatorURL    
 
+
 ##############################
-# Pilot E specific
+# Pilot Ev1 specific
 
 def getCaptureData (worldstate):
     # get CaptureData reference from worldstate 
@@ -432,9 +531,9 @@ def getCaptureData (worldstate):
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{}/{}.{}/{}".format (worldstate.endpoint, worldstate.domain, "worldstates", worldstate.id), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (worldstate.endpoint, worldstate.domain, "worldstates", worldstate.id), params=params, headers=headers) 
     if response.status_code != 200:
-        raise Exception ( "Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     # Depending on the requests-version json might be an field instead of on method
     jsonData = response.json() if callable (response.json) else response.json
     """
@@ -454,20 +553,22 @@ def getCaptureData (worldstate):
          u'$self': u'/CRISMA.worldstates/1'
         }
     """
-      
+    # logging.info (jsonData)
     captureDataURL = None
     for wsd in jsonData['worldstatedata']:
         if wsd['name'] == 'Exercise Data':
-            captureDataURL = string.replace (wsd['datadescriptor']['defaultaccessinfo'], ':id', wsd['actualaccessinfo'])
+            captureDataURL = string.replace (wsd['datadescriptor']['defaultaccessinfo'], ':id', str (wsd['actualaccessinfo']))
 
     if captureDataURL is None:
         raise Exception ("Capture-data URL not found")
+
+    logging.info ("Capture-data URL: {0}".format (captureDataURL))
 
     params = {}
     headers = {'content-type': 'application/json'}
     response = requests.get(captureDataURL, params=params, headers=headers) 
     if response.status_code != 200:
-        raise Exception ( "Error accessing ICMM at {}: {}".format (response.url, response.status_code))
+        raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     # Depending on the requests-version json might be an field instead of on method
     jsonData = response.json() if callable (response.json) else response.json
     return jsonData
@@ -475,7 +576,7 @@ def getCaptureData (worldstate):
 
 if __name__ == "__main__":
     for c in ["worldstates", "transitions", "dataitems"]:
-        print "{}: {}".format (c, getId (c)) 
+        print "{0}: {1}".format (c, getId (c)) 
     # print addIndicatorRefToICMM (1, "testIndicator", "description of test indicator", {"id":193838, "resource":"EntityProperty"}) 
     # print getOOIRef (1, 'OOI-worldstate-ref')  # http://crisam-ooi.ait.ac.at/api/worldstate/335
     # print getOOIRef (2, 'OOI-worldstate-ref')  # Exception: No such ICMM WorldState

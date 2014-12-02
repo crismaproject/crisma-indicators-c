@@ -1,9 +1,11 @@
 """
-Peter Kutschera, 2013-09-11
-Time-stamp: "2014-05-21 11:28:50 peter"
+Peter Kutschera, 2014-11-27
+Time-stamp: "2014-12-02 15:12:26 peter"
 
-This is a base class for inicators holding all common code
-Includes basic handling of ICMM.
+This is a base class for indcators holding all common code
+Includes basic handling of ICMM and OOI-WSR.
+Input datya is taken from ICMM and OOI
+Indicators and KPI are stored in ICMM
 """
 
 """
@@ -34,6 +36,7 @@ import time
 import logging
 
 import ICMMtools as ICMM
+import OOItools as OOI
 
 class Indicator(WPSProcess):
 
@@ -49,22 +52,25 @@ class Indicator(WPSProcess):
             abstract=abstract,
             grassLocation = False)
         self.ICMMworldstateURL = self.addLiteralInput (identifier = "ICMMworldstateURL",
-                                                type = type(""),
-                                                title = "ICMM WorldState id")
-        self.icmmRef=self.addLiteralOutput(identifier = "ICMMindicatorRefURL",
-                                          type = type (""),
-                                          title = "URL to access indicator reference from ICMM")
-        self.icmmVal=self.addLiteralOutput(identifier = "ICMMindicatorValueURL",
+                                                       type = type(""),
+                                                       title = "ICMM WorldState id")
+        self.indicatorRef=self.addLiteralOutput(identifier = "ICMMindicatorValueURL",
+                                                type = type (""),
+                                                title = "URL to access indicator value from ICMM")
+        self.kpiRef=self.addLiteralOutput(identifier = "ICMMkpiValueURL",
                                           type = type (""),
                                           title = "URL to access indicator value from ICMM")
-        self.value=self.addLiteralOutput(identifier = "value",
-                                         type = type (""),
-                                         title = "indicator value")
+        self.indicator=self.addLiteralOutput(identifier = "indicator",
+                                             type = type (""),
+                                             title = "indicator value")
+        self.kpi=self.addLiteralOutput(identifier = "kpi",
+                                       type = type (""),
+                                       title = "kpi value")
         # for ICMM and OOI
         self.doUpdate = 1              # 1: recalculate existing indicator; 0: use existing value
         self.ICMMworldstate = None     # Access-object for ICMM WorldState
         self.worldstateDescription = None  # description of WorldState: ICMMname, ICMMdescription, ICMMworldstateURL, OOIworldstateURL
-
+        self.OOIworldstate = None      # Access-object for OOI-WSR WorldState
     """
     def calculateIndicator(self):
         # create indicator value structure
@@ -76,7 +82,20 @@ class Indicator(WPSProcess):
             'type': "number",
             'data': 42
             }
-        return indicatorData
+        # KPI
+        kpiData = {
+           "casualties": {
+             "displayName": "Casualties",
+             "iconResource": "flower_16.png",
+             "noOfDead": {
+                "displayName": "Number of dead",
+                "iconResource": "flower_dead_16.png",
+                "value": 257,
+                "unit": "People"
+             }, ...
+           }, ...
+        }
+        return {indicator: indicatorData, kpi: kpiData}
     """
                                            
     def execute(self):
@@ -85,38 +104,56 @@ class Indicator(WPSProcess):
 
         # http://crisma.cismet.de/icmm_api/CRISMA.worldstates/1
         ICMMworldstateURL = self.ICMMworldstateURL.getValue()
-        logging.info ("ICMMworldstateURL = {}".format (ICMMworldstateURL))
+        logging.info ("ICMMworldstateURL = {0}".format (ICMMworldstateURL))
         if (ICMMworldstateURL is None):
-            return "invalid ICMM URL: {}".format (ICMMworldstateURL)
+            return "invalid ICMM URL: {0}".format (ICMMworldstateURL)
 
         # ICMM-URL -> Endpoint, id, ...
         self.ICMMworldstate = ICMM.ICMMAccess (ICMMworldstateURL)
-        logging.info ("ICMMworldstate = {}".format (self.ICMMworldstate))
+        logging.info ("ICMMworldstate = {0}".format (self.ICMMworldstate))
         if (self.ICMMworldstate.endpoint is None):
-            return "invalid ICMM ref: {}".format (self.ICMMworldstate)
+            return "invalid ICMM ref: {0}".format (self.ICMMworldstate)
         
         self.worldstateDescription = ICMM.getNameDescription (self.ICMMworldstate.id, baseUrl=self.ICMMworldstate.endpoint)
         self.worldstateDescription["ICMMworldstateURL"] = ICMMworldstateURL
 
+        OOIworldstateURL = ICMM.getOOIRef (self.ICMMworldstate.id, 'OOI-worldstate-ref', baseUrl=self.ICMMworldstate.endpoint)
+        logging.info ("OOIworldstateURL = {}".format (OOIworldstateURL))
+        if (OOIworldstateURL is None):
+            return "invalid OOI URL: {}".format (OOIworldstateURL)
+        self.worldstateDescription["OOIworldstateURL"] = OOIworldstateURL
+        
+        # OOI-URL -> Endpoint, id, ...
+        self.OOIworldstate = OOI.OOIAccess(OOIworldstateURL)
+        logging.info ("OOIWorldState = {}".format (self.OOIworldstate))
+        if (self.OOIworldstate.endpoint is None):
+            return "invalid OOI ref: {}".format (self.OOIworldstate)
+
         self.status.set("Check if indicator value already exists", 10)
 
         indicatorURL = ICMM.getIndicatorURL (self.ICMMworldstate.id, self.identifier, baseUrl=self.ICMMworldstate.endpoint)
-        logging.info ("old indicatorURL = {}".format (indicatorURL))
+        logging.info ("old indicatorURL = {0}".format (indicatorURL))
         if (indicatorURL is not None):
-            logging.info ("Indicator value already exists at: {}".format (indicatorURL))
+            logging.info ("Indicator value already exists at: {0}".format (indicatorURL))
 
         if ((self.doUpdate == 1) or (indicatorURL is None)):
             try:
-                indicatorData = self.calculateIndicator ()
+                data = self.calculateIndicator ()
+
+                if 'indicator' in data:
+                    logging.info ("indicatorData: {0}".format (json.dumps (data['indicator'])))
+                    self.indicator.setValue (json.dumps (data['indicator']))
+                    ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, data['indicator'], self.ICMMworldstate.endpoint)
+                    self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
+
+                if 'kpi' in data:
+                    logging.info ("kpiData: {0}".format (json.dumps (data['kpi'])))
+                    self.kpi.setValue (json.dumps (data['kpi']))
+                    ICMMkpiValueURL = ICMM.addKpiValToICMM (self.ICMMworldstate.id, self.identifier, self.title, data['kpi'], self.ICMMworldstate.endpoint)
+                    self.kpiRef.setValue(escape (ICMMkpiValueURL))
+
             except Exception, e:
-                logging.error ("calculateIndicator: {}".format (str(e.args)))
-                return ("calculateIndicator: {}".format (str(e.args)))
-
-            logging.info ("indicatorData: {}".format (json.dumps (indicatorData)))
-            self.value.setValue (json.dumps (indicatorData))
-
-            ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, indicatorData, self.ICMMworldstate.endpoint)
-            self.icmmVal.setValue(escape (ICMMindicatorValueURL))
-
+                logging.error ("calculateIndicator: {0}".format (str(e.args)))
+                return ("calculateIndicator: {0}".format (str(e.args)))
         return
 
