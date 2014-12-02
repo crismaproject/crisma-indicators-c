@@ -1,0 +1,10 @@
+This software is available under a GPLv2 license.
+
+Software used:
+ pywps-3.2.1 (GPL, see http://pywps.wald.intevation.org/)
+ JQuery (MIT License, see http://jquery.com/)
+ Angualar.js (MIT Lizense, see https://angularjs.org/)
+ Bootstrap (MIT License, see http://getbootstrap.com/)
+ D3.js (BSD License, see http://d3js.org/)
+ Docker (Apache License, see https://docker.com/)
+

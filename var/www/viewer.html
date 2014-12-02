@@ -1,0 +1,97 @@
+<DOCTYPE html5>
+<!--
+ Peter.Kutschera@ait.ac.at, 2014-02-25
+ Time-stamp: "2014-02-28 13:25:28 peter"
+-->
+<!--
+    Copyright (C) 2014  AIT / Austrian Institute of Technology
+    http://www.ait.ac.at
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 2 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/gpl-2.0.html
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tree Viewer</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <script src="js/angular-1.2.13/angular.js"></script>
+  <script src="js/moment.min.js"></script>
+  <script src="js/jquery-2.0.3.min.js"></script>
+  <script src="js/spin.min.js"></script>
+  <script src="js/jquery.spin.js"></script>
+  <script src="js/d3.v3/d3.v3.js" charset="utf-8"></script>
+  <link rel="stylesheet" href="css/wst-tree.css">
+  <link rel="stylesheet" href="css/wst-indicator-bars.css">
+  <link rel="stylesheet" href="css/wst-indicator-intervals.css">
+  <script src="libs/wstControllers.js"></script>
+  <script src="libs/wst-tree-graph.js"></script>
+  <script src="libs/wst-tree-data.js"></script>
+  <script src="libs/wst-indicator-timeIntervals.js"></script>
+  <script src="libs/wst-indicator-bars.js"></script>
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+
+<div ng-app="wstApp" ng-controller="treeCtrl">
+    <table class="table">
+      <tr>
+	<td>Select a baseline WorldState:</td>
+	<td><select ng-model="baseline" ng-options="s.worldStateId + '/' + s.simulation.description for s in baselines"></select></td>
+	<td><button type="button" class="btn btn-primary" ng-click="createWorldStateTree()">Show WorldState tree</button></td>
+      </tr>
+      <tr>
+	<td>Group indicators by:</td>
+	<td><input type="radio" ng-model="groupIndicatorsBy" value="worldstate"> WorldState <input type="radio" ng-model="groupIndicatorsBy" value="indicator"> Indicator</td>
+      </tr>
+    </table>
+    <table class="table">
+      <tr>
+	<td><tree-graph base-ws="treeData" on-selection="selectWorldStates(selection)" width="960" min-time="minTime" max-time="maxTime"></tree-graph></td>
+      </tr>
+      <tr>
+	<td><indicator-time-intervals indicator-data="indicators" width="960" min-time="minTime" max-time="maxTime" group-indicators-by="groupIndicatorsBy"></indicator-time-intervals></td>
+      </tr>
+      <tr>
+	<td><indicator-bars indicator-data="indicators" group-indicators-by="groupIndicatorsBy" width="960" height="160"></indicator-bars></td>
+      </tr>
+    </table>
+<!--
+    <p>
+      <ul class="indicators" id="list">
+	<li ng-repeat="selectedWorldState in selectedWorldStates">
+	  <h4>Indicator values for WorldState {{selectedWorldState}}:</h4>
+	  <ul>
+	    <li ng-repeat="indicator in indicators[selectedWorldState] track by $index">
+	      {{indicator}}
+	    </li>
+	  </ul>
+	</li>
+      </ul>
+    </p>    
+-->
+
+<!--
+    <button type="button" class="btn btn-primary" ng-click="test()">test</button>
+-->   
+
+</div>
+    
+</body>
+</html>

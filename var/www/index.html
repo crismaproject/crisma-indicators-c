@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--
+/home/peter/public_html/wps/indicators.html
+Peter Kutschera, Wed Sep 11 12:43:30 2013$
+$Id$
+Time-stamp: "2014-04-01 14:17:19 peter"
+Peter.Kutschera@ait.ac.at   (AIT - Austrian Institute of Technology)
+-->
+
+<!--
+    Copyright (C) 2014  AIT / Austrian Institute of Technology
+    http://www.ait.ac.at
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 2 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/gpl-2.0.html
+-->
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="Author" content="Peter.Kutschera@ait.ac.at">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indicators test-page</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <script src="js/angular-1.2.13/angular.js"></script>
+  <script src="js/jquery-2.0.3.min.js"></script>
+  <script src="js/spin.min.js"></script>
+  <script src="js/jquery.spin.js"></script>
+  <script src="js/xml2json.min.js"></script>
+  <script src="libs/wpsControllers.js"></script>
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <style type="text/css">
+    <!--
+	.big { font-size:20pt }
+      -->
+  </style>
+</head>
+<body ng-app="wpsApp" ng-controller="wpsCtrl">
+<div class="container">
+  <H1><center>
+      <a href="http://www.crismaproject.eu/">CRISMA</a> Indicator Test Page
+  </center></H1>
+  <hr>
+  <p>
+    This WPS allows the calculation of indicators for WorldStates. 
+    As the indicator needs to be comparable between different WorldStates the only allowed input parameter is the WorldState reference pointing into ICMM.
+  </p>
+  <p>
+    <h3>Workflow (For the indicator, but it is the same for simulation models):</h3>
+    <ol>
+      <li> Request to indicator service (PyWPS in this case) to calculate an indicater for a particular ICMM WorldState.
+      <li> To calculate the indicator input data is needed. But only the indicator service knows which one is needed for a particular indicator. So the indicator process asks ICMM for access to the storage of the actual needed input data (only OOI-WSR in the moment).
+      <li> The indicator value is calculated
+      <li> The indicator value is stored in OOI-WSR
+      <li> The reference to the value is stored in ICMM
+      <li> Model (WPS) returns URI to ICMM and the actual value. Both are only used for developement purposes since all requests for data will again go over ICMM as the central meta-information catalogue.
+    </ol>
+
+    More details can be found in <a href="https://crisma-cat.ait.ac.at/component/lifeIndicator">the CRISMA catalogue</a>.
+  </p>
+
+  <h3>Access to the indicators (WPS):</h3>
+
+  <form class="form-horizontal" role="form">
+    <div class="form-group">
+      <label for="capabilities">Get a description of the WPS instance and list of all processes (e.g. indicators) available</label>
+      <p class="form-control-static" id="capabilities">
+	<a href='{{wpsEndpoint}}?service=WPS&request=GetCapabilities' target='GetCapabilities'>{{wpsEndpoint}}?service=WPS&request=GetCapabilities</a>
+      </p>
+    </div>
+    
+    <div class="form-group">
+      <label for="iselect">Select process (indicator) to use</label>
+      <select id="iselect" class="form-control" ng-model="indicator" ng-options="indi for indi in indicators"></select>
+    </div>
+    
+    
+    <div class="form-group">
+      <label for="describe">Get a description of the selected process (indicator)</label>
+      <p class="form-control-static" id="describe">
+	<a href='{{wpsEndpoint}}?service=WPS&request=DescribeProcess&version=1.0.0&identifier={{indicator}}' target='DescribeProcess'>{{wpsEndpoint}}?service=WPS&request=DescribeProcess&version=1.0.0&identifier={{indicator}}</a>
+      </p>
+    </div>
+    
+    
+    <div class="form-group">
+      <label for="icmm">Select ICMM worldstate URL to use</label>
+      <input id="icmm" class="form-control" type="url" ng-model="worldstateUrl" required></input> 
+    </div>
+    
+    
+    <div class="form-group">
+      <label for="execute">Execute the selected process (indicator) with the given ICMM worldstate URL as parameter</label>
+      <p class="form-control-static" id="execute">
+	<a href='{{wpsEndpoint}}?service=WPS&request=Execute&version=1.0.0&identifier={{indicator}}&datainputs=ICMMworldstateURL={{worldstateUrl}}' target='Execute'>{{wpsEndpoint}}?service=WPS&request=Execute&version=1.0.0&identifier={{indicator}}&datainputs=ICMMworldstateURL={{worldstateUrl}}</a>
+      </p>
+    </div>
+    
+  </form>
+  
+
+  <p>
+    See <a href='http://crisma-ooi/swaggerui/'>WorldState repository</a> for valid WorldState URIs.
+  </p>
+  <p>
+    See <a href="http://wiki.rsg.pml.ac.uk/pywps/Main_Page">PyWPS WIKI</a> for details about the used WPS server.
+  </p>
+  <hr>
+  <a href='http://www.ait.ac.at/meta-menu/impressum/' title='Impressum', target="Impressum">Impressum</a>
+  <p>
+    <div style="font-size:12px;">
+      <!--
+      Request from: <!--#echo var="REMOTE_ADDR" -->
+      <br>
+      Server instance: <!--#echo var="SERVER_ADDR" -->
+      <br>
+      -->
+      Last update: <a href="mailto:Peter.Kutschera@ait.ac.at">Peter Kutschera</a>, Seibersdorf, 2014-03-21
+    </div>
+  </p>
+
+</div>
+</body>
+</html>
+
+
