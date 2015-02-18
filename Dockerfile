@@ -14,9 +14,9 @@
 FROM debian:7.7
 MAINTAINER Peter.Kutschera@ait.ac.at
 
-RUN apt-get update && apt-get install -y apache2 python python-magic python-requests && apt-get clean
+RUN apt-get update && apt-get install -y apache2 python python-magic python-requests python-dateutil curl vim && apt-get clean
 
-# If pythoin-requests is to olg get the newer version instead: 
+# If pythoin-requests is too old get the newer version instead: 
 # RUN apt-get install python-pip
 # RUN pip install requests
 

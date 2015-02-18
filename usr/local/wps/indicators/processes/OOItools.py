@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Peter.Kutschera@ait.ac.at, 2014-03-14
-# Time-stamp: "2014-04-15 10:59:05 peter"
+# Time-stamp: "2015-02-18 14:09:13 peter"
 #
 # Tools to access OOI
 
@@ -13,7 +13,12 @@ defaultBaseUrl = 'http://crisma-ooi.ait.ac.at/api'
 
 # some constants, see OOI-WSR docu
 patientTypeId = 10         #is this sufficient or might there be subclasses?
-patientLifePropertyId = 42
+patientExposedPropertyId = 476        # if false this pationt is not part of the game, ignore him/her
+patientLifePropertyId = 42            # 0..100 
+patientTreatmentStatePropertyId = 474 # Treatment-State	Supported values: None, Pre-Triaged, Triaged, On-Site-Treatment, Evacuating, Evacuated
+vehicleCapacityPropertyId = 19        # Ambulance-Capacity
+vehicleResourceCommandId = 1000       # Command to the resource
+vehicleAvailabilityPropertyId = 312   # -1: Vehicle is not part of the game
 indicatorEntityId = 101
 
 

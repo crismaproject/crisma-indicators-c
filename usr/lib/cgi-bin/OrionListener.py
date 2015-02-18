@@ -31,12 +31,8 @@ import string
 import time
 
 # list of indicators to calculate for each new worldstate
-indicators = [
-    'lifeIndicator', 
-    'deathsIndicator',
-    'seriouslyDeterioratedIndicator',
-    'improvedIndicator'
-    ]
+indicators = ['PatientHealth', 'Deaths', 'Improved', 'ResourceDepleted', 'EffectiveResponse', 'Evacuation']
+
 
 # WPS service
 wps = "http://localhost:80/cgi-bin/pywps.cgi?service=WPS&request=Execute&version=1.0.0&identifier={}&datainputs=ICMMworldstateURL={}"

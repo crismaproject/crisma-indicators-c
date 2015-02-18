@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2014-11-27
-Time-stamp: "2014-12-02 15:12:26 peter"
+Time-stamp: "2015-02-16 13:35:53 peter"
 
 This is a base class for indcators holding all common code
 Includes basic handling of ICMM and OOI-WSR.
@@ -143,8 +143,14 @@ class Indicator(WPSProcess):
                 if 'indicator' in data:
                     logging.info ("indicatorData: {0}".format (json.dumps (data['indicator'])))
                     self.indicator.setValue (json.dumps (data['indicator']))
-                    ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, data['indicator'], self.ICMMworldstate.endpoint)
-                    self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
+                    if isinstance(data['indicator'], list):
+                        for x in data['indicator']:
+                            ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, x['id'], x['name'], x, self.ICMMworldstate.endpoint)
+                            # only the last value will be used, sorry
+                            self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
+                    if isinstance(data['indicator'], dict):
+                        ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, data['indicator'], self.ICMMworldstate.endpoint)
+                        self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
 
                 if 'kpi' in data:
                     logging.info ("kpiData: {0}".format (json.dumps (data['kpi'])))

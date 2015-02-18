@@ -3,17 +3,14 @@ var x2js = new X2JS();
 
 
 wpsApp.controller ('wpsCtrl', function ($scope, $http) {
-    // test system:
     $scope.wpsEndpoint = "cgi-bin/pywps.cgi";
-    // production system
-    // $scope.wpsEndpoint = "https://crisma.ait.ac.at/indicators/pywps.cgi";
 
     // list of indicators from WPS capabilities - to be updated from WPS Capabilities
     $scope.indicators = [];  // ["deathsIndicator", "seriouslyDeterioratedIndicator", "improvedIndicator", "lifeIndicator"];
     $scope.indicator = null; // $scope.indicators[0];
 
     // example ICMM worldstate URL
-    $scope.worldstateUrl = "http://crisma.cismet.de/pilotC/icmm_api/CRISMA.worldstates/2";
+    $scope.worldstateUrl = "https://crisma-pilotC.ait.ac.at/icmm_api/CRISMA.worldstates/263";
 
     // ask WPS for indicators (Processes in GetCapabilities)
     $scope.loadIndicators = function() {

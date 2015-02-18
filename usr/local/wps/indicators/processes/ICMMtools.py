@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Peter.Kutschera@ait.ac.at, 2014-03-13
-# Time-stamp: "2014-12-01 12:37:36 peter"
+# Time-stamp: "2015-02-16 13:45:34 peter"
 #
 # Tools to access ICMM
 
@@ -19,6 +19,20 @@ import string
 import datetime
 import math
 import logging
+
+# Some ICMM "constants" that are used in pilotC and pilotE
+
+# categories/3: OOI-indicator-ref (pointing to OOI-WSR)
+categoryIdIndicatorRef = 3
+# categories/4: indicator-value
+categoryIdIndicatorValue = 4
+
+# datadescriptors/1: OOI-WSR reference
+datadescriptorIdOOIRef = 1
+# datadescriptors/3: indicator-value
+datadescriptorIdIndicatorValue = 3
+# datadescriptors/4: ICC data vector
+datadescriptorIdICCdata = 4
 
 class ICMMAccess:
     def __init__ (self, url):
@@ -47,6 +61,49 @@ class ICMMAccess:
 
     def __repr__ (self):
         return "endpoint={0}, domain={1}, clazz={2}, id={3}".format (self.endpoint, self.domain, self.clazz, self.id)
+
+
+def getConstants (baseUrl=defaultBaseUrl, domain=defaultDomain):
+    """Get id values for some clasifications and datadescriptors
+
+    """
+    params = {
+        'limit' :  999999999,
+        'level' : 1,
+        'fields' : 'id,key',
+        'class' : 'categories'
+        }
+    headers = {'content-type': 'application/json'}
+    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers) 
+    if response.status_code != 200:
+        raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.raise_for_status()))
+    # Depending on the requests-version json might be an field instead of on method
+    jsonData = response.json() if callable (response.json) else response.json
+    collection = jsonData['$collection']
+    for r in collection:
+        if r['key'] == 'OOI-indicator-ref':
+            categoryIdIndicatorRef = r['id']
+        elif r['key'] == 'indicator-value':
+            categoryIdIndicatorValue = r['id']
+    params = {
+        'limit' :  999999999,
+        'level' : 1,
+        'fields' : 'id,name',
+        'class' : 'datadescriptors'
+        }
+    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers) 
+    if response.status_code != 200:
+        raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.raise_for_status()))
+    # Depending on the requests-version json might be an field instead of on method
+    jsonData = response.json() if callable (response.json) else response.json
+    collection = jsonData['$collection']
+    for r in collection:
+        if r['key'] == 'OOI-WSR':
+            datadescriptorIdOOIRef = r['id']
+        elif r['key'] == 'indicator value':
+            datadescriptorIdIndicatorValue = r['id']
+        elif r['key'] == 'ICC Data Vector descriptor':
+            datadescriptorIdICCdata = r['id']
 
 
 def getId (clazz, baseUrl=defaultBaseUrl, domain=defaultDomain):
@@ -145,6 +202,43 @@ def getBaseWorldstate (wsid, baseCategory="Baseline", baseUrl=defaultBaseUrl, do
         worldstate =  worldstate['parentworldstate']
     return None # never reach this, just to see the end of the function.
 
+def getParentWorldstates (wsid, baseCategory="Baseline", baseUrl=defaultBaseUrl, domain=defaultDomain):
+    """Get parent worldstate ids uo and including the first with the given category or None
+    
+    default baseCategory: "Baseline". Other posibilities: "Template"
+    """
+    # http://crisma.cismet.de/pilotC/icmm_api/CRISMA.worldstates/3?level=1000&fields=parentworldstate%2Ccategories&omitNullValues=true&deduplicate=true
+    # get (grand*)parent worldstate list
+    params = {
+        'level' :  1000,
+        'fields' : "parentworldstate,categories,key,id",
+        'omitNullValues' : 'true',
+        'deduplicate' : 'true'
+        }
+    headers = {'content-type': 'application/json'}
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+
+    if response.status_code != 200:
+        raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
+    if response.text is None:
+        raise Exception ("No such ICMM WorldState")
+    if response.text == "":
+        raise Exception ("No such ICMM WorldState")
+
+    # Depending on the requests-version json might be an field instead of on method
+    worldstate = response.json() if callable (response.json) else response.json
+    worldstates = []
+    while (True):
+        worldstates.insert (0, worldstate['id'])
+        if ('categories' in worldstate):
+            for c in worldstate['categories']:
+                if c['key'] == baseCategory:                
+                    return worldstates
+        if ('parentworldstate' not in worldstate):
+            return None
+        worldstate =  worldstate['parentworldstate']
+    return None # never reach this, just to see the end of the function.
+
 
 
 def getIndicatorURL (wsid, name, baseUrl=defaultBaseUrl, domain=defaultDomain):
@@ -184,7 +278,7 @@ def getIndicatorURL (wsid, name, baseUrl=defaultBaseUrl, domain=defaultDomain):
         for d in worldstate['worldstatedata']:
             if ('categories' in d):
                 for c in d['categories']:
-                    if ((c['$ref'] == "/{0}.categories/4".format (domain)) and (d['name'] == name)):
+                    if ((c['$ref'] == "/{0}.categories/{1}".format (domain, categoryIdIndicatorValue)) and (d['name'] == name)):
                         # An indicator value with the given name is already there
                         ICMMindicatorURL = "{0}{1}".format (baseUrl, d['$self'])
     return ICMMindicatorURL
@@ -219,7 +313,6 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
     # Depending on the requests-version json might be an field instead of on method
     worldstate = response.json() if callable (response.json) else response.json
 
-    # t = time.time() * 1000
     t = datetime.datetime.utcnow().isoformat()
 
     # check if the indicator is already in the ICMM worldstate
@@ -227,8 +320,8 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
         for d in worldstate['worldstatedata']:
             if ('categories' in d):
                 for c in d['categories']:
-                    if ((c['$ref'] == "/{0}.categories/4".format (domain)) and (d['name'] == name)):
-                        # An indicator value with the given name is already there - TODO: update value
+                    if ((c['$ref'] == "/{0}.categories/{1}".format (domain, categoryIdIndicatorValue)) and (d['name'] == name)):
+                        # An indicator value with the given name is already there
                         ICMMindicatorURL = "{0}{1}".format (baseUrl, d['$self'])
                         logging.info ("Update indicator found at " + ICMMindicatorURL)
                         data = {
@@ -253,11 +346,11 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
         "description": description,
         "categories": [
             {
-                "$ref": "/{0}.categories/4".format (domain)
+                "$ref": "/{0}.categories/{1}".format (domain, categoryIdIndicatorValue)
                 }
             ],
         "datadescriptor": {
-            "$ref": "/{0}.datadescriptors/3".format (domain)
+            "$ref": "/{0}.datadescriptors/{1}".format (domain, datadescriptorIdIndicatorValue)
             },
         "actualaccessinfocontenttype": "application/json",
         "actualaccessinfo": json.dumps (value),
@@ -334,10 +427,10 @@ def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, dom
         icc = value
     else:
         for group in value:
-            logging.info ("   group = {0}".format (group))
+            # logging.info ("   group = {0}".format (group))
             if group in icc:
                 for name in value[group]:
-                    logging.info ("   ame = {0}".format(name))
+                    # logging.info ("    name = {0}".format(name))
                     icc[group][name] = value[group][name]
             else:
                 icc[group] = value[group]
@@ -353,7 +446,7 @@ def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, dom
             "description": "ICC Data by indicator WPS",
             "lastmodified": t,
             "datadescriptor": {
-                "$ref": "/{0}.datadescriptors/4".format (domain)
+                "$ref": "/{0}.datadescriptors/{1}".format (domain, datadescriptorIdICCdata)
                 },
             "actualaccessinfocontenttype": "application/json",
             "actualaccessinfo": json.dumps (icc)
@@ -477,7 +570,6 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
     # add dataitem to worldstate
     #   I need a new dataitems id
     dataitemsId = getId ("dataitems", baseUrl=baseUrl)
-    # t = time.time() * 1000
     t = datetime.datetime.utcnow().isoformat()
 
     data = {
@@ -487,11 +579,11 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
         "description": description,
         "categories": [
             {
-                "$ref": "/{0}.categories/3".format (domain)
+                "$ref": "/{0}.categories/{1}".format (domain, categoryIdIndicatorRef)
             }
         ],
         "datadescriptor": {
-            "$ref": "/{0}.datadescriptors/1".format (domain)
+            "$ref": "/{0}.datadescriptors/{1}".format (domain, datadescriptorIdOOIRef)
             },
         "actualaccessinfocontenttype": "URL",
         "actualaccessinfo": ooiref,
