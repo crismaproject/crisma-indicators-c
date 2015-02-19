@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Peter.Kutschera@ait.ac.at, 2014-03-13
-# Time-stamp: "2015-02-16 13:45:34 peter"
+# Time-stamp: "2015-02-19 13:59:42 peter"
 #
 # Tools to access ICMM
 
@@ -600,7 +600,7 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
     response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (worldstate)) 
 
     # Check why ICMM is not always sending events
-    #logging.info ("AddIndicatorToICMM: PUT {}/{}.{}/{} -- DATA = {}".format (baseUrl, domain, "worldstates", wsid, json.dumps (worldstate).replace ("\n", "")))
+    #logging.info ("AddIndicatorToICMM: PUT {0}/{1}.{2}/{3} -- DATA = {4}".format (baseUrl, domain, "worldstates", wsid, json.dumps (worldstate).replace ("\n", "")))
 
     if response.status_code != 200:
         raise Exception ("Error writing worldstate to ICMM at {0}: {1}".format (response.url, response.raise_for_status()))

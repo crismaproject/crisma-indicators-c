@@ -31,11 +31,11 @@ import string
 import time
 
 # list of indicators to calculate for each new worldstate
-indicators = ['PatientHealth', 'Deaths', 'Improved', 'ResourceDepleted', 'EffectiveResponse', 'Evacuation']
+indicators = ['PatientHealth', 'Deaths', 'Improved', 'ResourceDepleted', 'EffectiveResponse', 'Evacuation', 'UnusedResources']
 
 
 # WPS service
-wps = "http://localhost:80/cgi-bin/pywps.cgi?service=WPS&request=Execute&version=1.0.0&identifier={}&datainputs=ICMMworldstateURL={}"
+wps = "http://localhost:80/cgi-bin/pywps.cgi?service=WPS&request=Execute&version=1.0.0&identifier={0}&datainputs=ICMMworldstateURL={1}"
 
 print "Content-Type: text/plain"    # HTML is following
 print                               # blank line, end of headers
@@ -61,16 +61,16 @@ for elem in elems:
     for attr in elem["contextElement"]["attributes"]:
         if attr["name"].startswith ("worldstate"):
             value = attr["value"]
-            # print >>sys.stderr, "value1={} ({})".format (value, type (value))
+            # print >>sys.stderr, "value1={0} ({1})".format (value, type (value))
             if (isinstance (value, str)):
                 value = json.loads (value)
-                # print >>sys.stderr, "value2={}".format (value)
+                # print >>sys.stderr, "value2={0}".format (value)
             if (isinstance (value, unicode)):
                 value = json.loads (value)
-                # print >>sys.stderr, "value3={}".format (value)
+                # print >>sys.stderr, "value3={0}".format (value)
             wsURL = value["URI"]
             for indicator in indicators:
-                print >>sys.stderr, "Start indicator {} for {}".format (indicator, wsURL)
+                print >>sys.stderr, "Start indicator {0} for {1}".format (indicator, wsURL)
                 response = requests.get(wps.format (indicator, wsURL))
                 print >>sys.stderr, response.text
             

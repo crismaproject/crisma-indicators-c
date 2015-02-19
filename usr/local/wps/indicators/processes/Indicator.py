@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2014-11-27
-Time-stamp: "2015-02-16 13:35:53 peter"
+Time-stamp: "2015-02-19 14:00:08 peter"
 
 This is a base class for indcators holding all common code
 Includes basic handling of ICMM and OOI-WSR.
@@ -118,16 +118,16 @@ class Indicator(WPSProcess):
         self.worldstateDescription["ICMMworldstateURL"] = ICMMworldstateURL
 
         OOIworldstateURL = ICMM.getOOIRef (self.ICMMworldstate.id, 'OOI-worldstate-ref', baseUrl=self.ICMMworldstate.endpoint)
-        logging.info ("OOIworldstateURL = {}".format (OOIworldstateURL))
+        logging.info ("OOIworldstateURL = {0}".format (OOIworldstateURL))
         if (OOIworldstateURL is None):
-            return "invalid OOI URL: {}".format (OOIworldstateURL)
+            return "invalid OOI URL: {0}".format (OOIworldstateURL)
         self.worldstateDescription["OOIworldstateURL"] = OOIworldstateURL
         
         # OOI-URL -> Endpoint, id, ...
         self.OOIworldstate = OOI.OOIAccess(OOIworldstateURL)
-        logging.info ("OOIWorldState = {}".format (self.OOIworldstate))
+        logging.info ("OOIWorldState = {0}".format (self.OOIworldstate))
         if (self.OOIworldstate.endpoint is None):
-            return "invalid OOI ref: {}".format (self.OOIworldstate)
+            return "invalid OOI ref: {0}".format (self.OOIworldstate)
 
         self.status.set("Check if indicator value already exists", 10)
 

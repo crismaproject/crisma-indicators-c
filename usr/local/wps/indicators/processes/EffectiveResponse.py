@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-18 14:49:33 peter"
+Time-stamp: "2015-02-19 13:54:07 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -71,12 +71,12 @@ class Process(Indicator):
 
         # find out which pationts are part of the game
         IDsToSkip = []
-        logging.info("Request list of patient IDs to be taken into account from base OOI WorldState = {}".format (self.OOIworldstate.id))
+        logging.info("Request list of patient IDs to be taken into account from base OOI WorldState = {0}".format (self.OOIworldstate.id))
         params = {
             'wsid' :  self.OOIworldstate.id, 
             'etpid' : OOI.patientExposedPropertyId
             }
-        jsonBaseData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonBaseData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
         for ep in jsonBaseData:
             if ep["entityPropertyValue"].lower() == "false":
                 IDsToSkip.append (ep["entityId"])
@@ -91,7 +91,7 @@ class Process(Indicator):
             'wsid' : self.OOIworldstate.id, 
             'etpid' : OOI.patientTreatmentStatePropertyId
             }
-        jsonData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
 
         self.status.set("Got input data data", 21)
         logging.info ("worldstate data: {0}".format (json.dumps (jsonData)))
@@ -110,11 +110,11 @@ class Process(Indicator):
                 if 'None' == ep["entityPropertyValue"]:
                     number += 1;
             except:
-                logging.error ("Property is not a number: '{}'".format (ep["entityPropertyValue"]))
+                logging.error ("Property is not a number: '{0}'".format (ep["entityPropertyValue"]))
                 # ignore problem !?!?
                 pass
         
-        self.status.set("Calculated number: {}; out of totalCount: {}".format (number, totalCount), 40)
+        self.status.set("Calculated number: {0}; out of totalCount: {1}".format (number, totalCount), 40)
         
         if totalCount > 0:
             number = 100 * number / totalCount

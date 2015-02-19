@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-12 16:05:37 peter"
+Time-stamp: "2015-02-19 13:53:34 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -77,7 +77,7 @@ class Process(Indicator):
             'wsid' : self.OOIworldstate.id, 
             'etpid' : OOI.patientLifePropertyId
             }
-        jsonData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
 
         self.status.set("Got input data data", 21)
         self.status.set("Calculate indicator value", 30)
@@ -93,11 +93,11 @@ class Process(Indicator):
                 if life < requiredLifePropertyValue:
                     numberOfDeaths += 1;
             except:
-                logging.error ("Patient life property is not an integer: '{}'".format (ep["entityPropertyValue"]))
+                logging.error ("Patient life property is not an integer: '{0}'".format (ep["entityPropertyValue"]))
                 # ignore problem !?!?
                 pass
         
-        self.status.set("Calculated Deaths: {}".format (numberOfDeaths), 40)
+        self.status.set("Calculated Deaths: {0}".format (numberOfDeaths), 40)
         
         # create indicator value structure
         result = {

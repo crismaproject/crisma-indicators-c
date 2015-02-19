@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-18 15:14:49 peter"
+Time-stamp: "2015-02-19 13:55:48 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -69,20 +69,20 @@ class Process(Indicator):
         # find base WorldState from ICMM
         baseICMMworldstateId = ICMM.getBaseWorldstate (self.ICMMworldstate.id, baseCategory="Baseline", baseUrl=self.ICMMworldstate.endpoint)
         if (baseICMMworldstateId is None):
-            raise Exception ("Base ICMM WorldState not found for actual ICMM WorldState = {}".format (self.ICMMworldstate))
+            raise Exception ("Base ICMM WorldState not found for actual ICMM WorldState = {0}".format (self.ICMMworldstate))
 
         baseOOIworldstateURL = ICMM.getOOIRef (baseICMMworldstateId, 'OOI-worldstate-ref', baseUrl=self.ICMMworldstate.endpoint)
-        logging.info ("baseOOIworldstateURL = {}".format (baseOOIworldstateURL))
+        logging.info ("baseOOIworldstateURL = {0}".format (baseOOIworldstateURL))
         if (baseOOIworldstateURL is None):
-            raise Exception ("invalid OOI URL: {}".format (baseOOIworldstateURL))
+            raise Exception ("invalid OOI URL: {0}".format (baseOOIworldstateURL))
         
         # OOI-URL -> Endpoint, id, ...
         baseOOIworldstate = OOI.OOIAccess(baseOOIworldstateURL)
-        logging.info ("baseOOIWorldState = {}".format (baseOOIworldstate))
+        logging.info ("baseOOIWorldState = {0}".format (baseOOIworldstate))
         if (baseOOIworldstate.endpoint is None):
-            raise Exception ("invalid OOI ref: {}".format (baseOOIworldstate))
+            raise Exception ("invalid OOI ref: {0}".format (baseOOIworldstate))
 
-        self.status.set("Base WorldState: {}".format (baseOOIworldstateURL), 21)
+        self.status.set("Base WorldState: {0}".format (baseOOIworldstateURL), 21)
 
         # now:
         #  self.OOIworldstate: Actual worldstate I want to calculate the indicator for
@@ -91,12 +91,12 @@ class Process(Indicator):
 
         # find out which pationts are part of the game
         IDsToSkip = []
-        logging.info("Request list of patient IDs to be taken into account from base OOI WorldState = {}".format (baseOOIworldstate.id))
+        logging.info("Request list of patient IDs to be taken into account from base OOI WorldState = {0}".format (baseOOIworldstate.id))
         params = {
             'wsid' :  baseOOIworldstate.id, 
             'etpid' : OOI.patientExposedPropertyId
             }
-        jsonBaseData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonBaseData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
         for ep in jsonBaseData:
             if ep["entityPropertyValue"].lower() == "false":
                 IDsToSkip.append (ep["entityId"])
@@ -110,18 +110,18 @@ class Process(Indicator):
         totalCount = 0
 
         # base data:
-        logging.info("Request input data for base OOI WorldState = {}".format (baseOOIworldstate.id))
+        logging.info("Request input data for base OOI WorldState = {0}".format (baseOOIworldstate.id))
         params = {
             'wsid' :  baseOOIworldstate.id, 
             'etpid' : OOI.patientLifePropertyId
             }
-        jsonBaseData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonBaseData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
         # actual data:
         params = {
             'wsid' : self.OOIworldstate.id, 
             'etpid' : OOI.patientLifePropertyId
             }
-        jsonData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
 
         self.status.set("Calculate indicator value", 30)
         patients = {}
@@ -161,7 +161,7 @@ class Process(Indicator):
                 # ignore problem !?!?
                 pass
 
-        self.status.set("Calculated improvedIndicator for ICMM WorldState with id {}: {} out of {}".format (self.ICMMworldstate.id, numberOfImproved, len (patients)), 90)
+        self.status.set("Calculated improvedIndicator for ICMM WorldState with id {0}: {1} out of {2}".format (self.ICMMworldstate.id, numberOfImproved, len (patients)), 90)
 
         # create indicator value structure
         result = {

@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-18 15:35:37 peter"
+Time-stamp: "2015-02-19 13:54:44 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -91,7 +91,7 @@ class Process(Indicator):
         # find base WorldState from ICMM
         parents = ICMM.getParentWorldstates (self.ICMMworldstate.id, baseCategory="Baseline", baseUrl=self.ICMMworldstate.endpoint)
         if (parents is None):
-            raise Exception ("Base ICMM WorldState not found for actual ICMM WorldState = {}".format (self.ICMMworldstate))
+            raise Exception ("Base ICMM WorldState not found for actual ICMM WorldState = {0}".format (self.ICMMworldstate))
 
         basewsid = parents[0]
 
@@ -105,21 +105,21 @@ class Process(Indicator):
         for wsid in parents:
             logging.info ("get ws {0}".format (wsid))
             ooiWorldstateURL = ICMM.getOOIRef (wsid, 'OOI-worldstate-ref', baseUrl=self.ICMMworldstate.endpoint)
-            logging.info ("  ooiWorldstateURL = {}".format (ooiWorldstateURL))
+            logging.info ("  ooiWorldstateURL = {0}".format (ooiWorldstateURL))
             if (ooiWorldstateURL is None):
-                return "invalid OOI URL: {}".format (ooiWorldstateURL)
+                return "invalid OOI URL: {0}".format (ooiWorldstateURL)
             # OOI-URL -> Endpoint, id, ...
             ooiWorldstate = OOI.OOIAccess(ooiWorldstateURL)
-            # logging.info ("ooiWorldState = {}".format (ooiWorldstate))
+            # logging.info ("ooiWorldState = {0}".format (ooiWorldstate))
             if (ooiWorldstate.endpoint is None):
-                return "invalid OOI ref: {}".format (ooiWorldstate)
+                return "invalid OOI ref: {0}".format (ooiWorldstate)
         
 
-            logging.info("Request input data for OOI WorldState = {}".format (ooiWorldstate.id))
+            logging.info("Request input data for OOI WorldState = {0}".format (ooiWorldstate.id))
             params = {
                 'wsid' :  ooiWorldstate.id 
                 }
-            jsonData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+            jsonData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
 
             # this now contaions ALL EntityPropertyIds !
 
@@ -174,7 +174,7 @@ class Process(Indicator):
                     t2 = self.getTimeFromICMMws (wsid)
                     break;
 
-        self.status.set("Calculated 'Evacuation' indicator: Start Excercise: {}, start evacuation: {}, end evacuation {}, end exercise (so far): {}".format (
+        self.status.set("Calculated 'Evacuation' indicator: Start Excercise: {0}, start evacuation: {1}, end evacuation {2}, end exercise (so far): {0}".format (
                 t0.isoformat(), 
                 "not yet" if t1 == None else t1.isoformat(), 
                 "not yet" if t2 == None else t2.isoformat(), 

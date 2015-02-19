@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Peter.Kutschera@ait.ac.at, 2014-03-13
-# Time-stamp: "2014-03-14 12:56:54 kutscherap"
+# Time-stamp: "2015-02-19 13:58:45 peter"
 #
 # test ICMMtools
 
@@ -10,7 +10,7 @@ import ICMMtools
 if __name__ == "__main__":
 
     for c in ["worldstates", "transitions", "dataitems"]:
-        print "{}: {}".format (c, ICMMtools.getId (c)) 
+        print "{0}: {1}".format (c, ICMMtools.getId (c)) 
 
     parsedICMMUrl = ICMMtools.ICMMAccess ('https://crisma.cismet.de/pilotC/icmm_api/CRISMA.worldstates/1')
     print parsedICMMUrl
@@ -20,4 +20,4 @@ if __name__ == "__main__":
 
     if (parsedICMMUrl is not None):
         for c in ["worldstates", "transitions", "dataitems"]:
-            print "{}: {}".format (c, ICMMtools.getId (c, baseUrl=parsedICMMUrl.endpoint))
+            print "{0}: {1}".format (c, ICMMtools.getId (c, baseUrl=parsedICMMUrl.endpoint))

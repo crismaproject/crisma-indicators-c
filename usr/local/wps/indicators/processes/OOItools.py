@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Peter.Kutschera@ait.ac.at, 2014-03-14
-# Time-stamp: "2015-02-18 14:09:13 peter"
+# Time-stamp: "2015-02-19 13:57:26 peter"
 #
 # Tools to access OOI
 
@@ -19,6 +19,7 @@ patientTreatmentStatePropertyId = 474 # Treatment-State	Supported values: None, 
 vehicleCapacityPropertyId = 19        # Ambulance-Capacity
 vehicleResourceCommandId = 1000       # Command to the resource
 vehicleAvailabilityPropertyId = 312   # -1: Vehicle is not part of the game
+vehicleDisplayStatePropertyId = 327   # "", Idle, Treat, Rescue, Evacuate, Refill, Dispatch, Build-Area
 indicatorEntityId = 101
 
 
@@ -52,16 +53,16 @@ class OOIAccess:
                 self.id = int (match.group(3))
 
     def __repr__ (self):
-        return "endpoint={}, resource={}, id={}".format (self.endpoint, self.resource, self.id)
+        return "endpoint={0}, resource={1}, id={2}".format (self.endpoint, self.resource, self.id)
 
 def getJson (url, params=None, headers={'content-type': 'application/json'}):
     entityProperties = requests.get(url, params=params, headers=headers) 
     if entityProperties.status_code != 200:
-        raise Exception ("Error accessing OOI-WSR at {}: {}".format (urllib.quote (entityProperties.url), entityProperties.status_code))
+        raise Exception ("Error accessing OOI-WSR at {0}: {1}".format (urllib.quote (entityProperties.url), entityProperties.status_code))
     if entityProperties.text is None:
-        raise Exception ("Error accessing OOI-WSR at {}: {}".format (urllib.quote (entityProperties.url), "No such entityProperties"))
+        raise Exception ("Error accessing OOI-WSR at {0}: {1}".format (urllib.quote (entityProperties.url), "No such entityProperties"))
     if entityProperties.text == "":
-        raise Exception ("Error accessing OOI-WSR at {}: {}".format (urllib.quote (entityProperties.url), "No such entityProperties"))
+        raise Exception ("Error accessing OOI-WSR at {0}: {1}".format (urllib.quote (entityProperties.url), "No such entityProperties"))
     jsonData = entityProperties.json() if callable (entityProperties.json) else entityProperties.json
     return jsonData
 
@@ -80,20 +81,20 @@ def getIndicatorRef (wsid, indicatorPropertyId, baseUrl=defaultBaseUrl):
         'etpid' : indicatorPropertyId
         }
     headers = {'content-type': 'application/json'}
-    jsonData = getJson ("{}/EntityProperty".format (baseUrl), params=params, headers=headers) 
+    jsonData = getJson ("{0}/EntityProperty".format (baseUrl), params=params, headers=headers) 
     # count already existing results
     existingResults = 0;
     for ep in jsonData:
         existingResults +=1
     if existingResults > 1:
-        raise Exception ("There are already {} results! This should not be the case!".format (existingResults))
+        raise Exception ("There are already {0} results! This should not be the case!".format (existingResults))
         # Just an idea, does not work as is
-        #result = requests.delete("{}/EntityProperty".format (baseUrl), params=params, headers=headers)         
+        #result = requests.delete("{0}/EntityProperty".format (baseUrl), params=params, headers=headers)         
         #logging.info (result)
         #exisitingResults = 0;
     if existingResults == 1:
         existingResultId = jsonData[0]['entityPropertyId']
-        indicatorURL = "{}/EntityProperty/{}".format (baseUrl, existingResultId)
+        indicatorURL = "{0}/EntityProperty/{1}".format (baseUrl, existingResultId)
     return indicatorURL
 
 def storeIndicatorValue (wsid, indicatorPropertyId, indicatorValue, indicatorURL=None, baseurl=defaultBaseUrl):
@@ -116,17 +117,17 @@ def storeIndicatorValue (wsid, indicatorPropertyId, indicatorValue, indicatorURL
         "worldStateId": wsid,
         }
     if (indicatorURL is None):
-        result = requests.post ("{}/{}".format (baseurl, "EntityProperty"), data=json.dumps (indicatorProperty), headers={'content-type': 'application/json'})
+        result = requests.post ("{0}/{1}".format (baseurl, "EntityProperty"), data=json.dumps (indicatorProperty), headers={'content-type': 'application/json'})
         if result.status_code != 201:
-            raise Exception ("Unable to POST result at {}/{}: {}".format (baseurl, "EntityProperty", result.status_code))
+            raise Exception ("Unable to POST result at {0}/{1}: {2}".format (baseurl, "EntityProperty", result.status_code))
         resultData = result.json() if callable (result.json) else result.json
         newResult = resultData[u'entityPropertyId']
-        indicatorURL = "{}/{}/{}".format (baseurl, "EntityProperty", newResult)
+        indicatorURL = "{0}/{1}/{2}".format (baseurl, "EntityProperty", newResult)
     else:
         existingResultId = OOIAccess (indicatorURL).id
         indicatorProperty["entityPropertyId"] = existingResultId
         result = requests.put (indicatorURL, data=json.dumps (indicatorProperty), headers={'content-type': 'application/json'})
         if result.status_code != 200:
-            raise Exception ("Unable to PUT result to {}: {}".format (indicatorURL, result.status_code))
+            raise Exception ("Unable to PUT result to {0}: {1}".format (indicatorURL, result.status_code))
     return indicatorURL
 

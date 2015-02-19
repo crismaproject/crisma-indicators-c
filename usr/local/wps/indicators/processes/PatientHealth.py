@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-18 14:41:25 peter"
+Time-stamp: "2015-02-19 13:57:48 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -71,12 +71,12 @@ class Process(Indicator):
 
         # find out which pationts are part of the game
         IDsToSkip = []
-        logging.info("Request list of patient IDs to be taken into account from base OOI WorldState = {}".format (self.OOIworldstate.id))
+        logging.info("Request list of patient IDs to be taken into account from base OOI WorldState = {0}".format (self.OOIworldstate.id))
         params = {
             'wsid' :  self.OOIworldstate.id, 
             'etpid' : OOI.patientExposedPropertyId
             }
-        jsonBaseData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonBaseData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
         for ep in jsonBaseData:
             if ep["entityPropertyValue"].lower() == "false":
                 IDsToSkip.append (ep["entityId"])
@@ -90,7 +90,7 @@ class Process(Indicator):
             'wsid' : self.OOIworldstate.id, 
             'etpid' : OOI.patientLifePropertyId
             }
-        jsonData = OOI.getJson ("{}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
+        jsonData = OOI.getJson ("{0}/EntityProperty".format (self.OOIworldstate.endpoint), params=params) 
 
         self.status.set("Got input data data", 21)
         self.status.set("Calculate indicator value", 30)
@@ -117,7 +117,7 @@ class Process(Indicator):
                 # ignore problem !?!?
                 pass
         
-        self.status.set("Calculated PatientHealth: {}".format (numberOfPatients), 40)
+        self.status.set("Calculated PatientHealth: {0}".format (numberOfPatients), 40)
         
         # create indicator value structure
         result = {
