@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-19 13:54:44 peter"
+Time-stamp: "2015-02-20 10:18:15 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -65,7 +65,14 @@ class Process(Indicator):
             identifier="Evacuation", #the same as the file name
             version = "1.0",
             title="Evacuation time",
-            abstract="Evacuation start and end")
+            abstract="""Evacuation start and end.
+
+indicator;Evacuation;Evacuation time;Evacuation start and end;timeintervals
+indicator;TimeToEvacuation;Time to Evacuation;Minutes from start till evacuation is ordered;number
+indicator;LastPatientEvacuated;Last Patient Evacuated;Minutes from start till last patient is evacuated;number
+kpi;Evacuation;Evacuation completed;Minutes from start till last patient is evacuated;number
+
+""")
 
     def getTimeFromICMMws (self, wsid):
         params = {
@@ -192,7 +199,7 @@ class Process(Indicator):
             indicators.append ({
                     'id': "TimeToEvacuation",
                     'name': "Time to Evacuation",
-                    'description': "Time from start till evacuation is ordered",
+                    'description': "Minutes from start till evacuation is ordered",
                     "worldstateDescription": self.worldstateDescription,
                     'worldstates': parents,
                     'type': "number",
@@ -207,7 +214,7 @@ class Process(Indicator):
                         }
                     ]
             else:
-                # evacuation compleated
+                # evacuation completed
                 intervals = [
                     {
                         "startTime": t1.isoformat(),
@@ -217,7 +224,7 @@ class Process(Indicator):
                 indicators.append ({
                         'id': "LastPatientEvacuated",
                         'name': "Last Patient Evacuated",
-                        'description': "Time from start till last patient is evacuated",
+                        'description': "Minutes from start till last patient is evacuated",
                         "worldstateDescription": self.worldstateDescription,
                         'worldstates': parents,
                         'type': "number",
@@ -225,7 +232,7 @@ class Process(Indicator):
                         })
                 result['kpi'] = {
                     "delay": {
-                        "displayName": "Evacuation compleated",
+                        "displayName": "Evacuation completed",
                         "iconResource": "flower_16.png",
                         self.identifier: {
                             "displayName": self.title,

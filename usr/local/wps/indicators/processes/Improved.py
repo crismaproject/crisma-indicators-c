@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-19 13:55:48 peter"
+Time-stamp: "2015-02-20 11:38:58 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -62,7 +62,15 @@ class Process(Indicator):
             identifier="Improved", #the same as the file name
             version = "1.0",
             title="Improved patients",
-            abstract="Number of patients with actual health better or equal as at the beginning")
+            abstract="""Number of patients with actual health better or equal as at the beginning.
+
+indicator;Improved;Improved patients;Number of patients with actual health better or equal as at the beginning;number
+indicator;SeriouslyDeteriorated;Seriously deteriorated patients;Number of patients with (actual health) less than (health at the beginning - 50);number
+kpi;;Improved;Improved patients;Number of patients with actual health better or equal as at the beginning;number
+kpi;SeriouslyDeteriorated;Seriously deteriorated patients;Number of patients with (actual health) less than (health at the beginning - 50);number
+
+
+""")
 
     def calculateIndicator(self):
         self.status.set("Start collecting input data", 20)

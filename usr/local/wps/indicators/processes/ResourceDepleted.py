@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-19 13:58:24 peter"
+Time-stamp: "2015-02-20 10:25:17 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -62,7 +62,12 @@ class Process(Indicator):
             identifier="ResourceDepleted", #the same as the file name
             version = "1.0",
             title="Number of depleted resources",
-            abstract="Number of vehicles with response capacity 20% or lower")
+            abstract="""Number of vehicles with response capacity 20% or lower.
+
+indicator;ResourceDepleted;Number of depleted resources;Number of vehicles with response capacity 20% or lower;number
+kpi;ResourceDepleted;Number of depleted resources;Number of vehicles with response capacity 20% or lower;number
+
+""")
 
 
     def calculateIndicator(self):

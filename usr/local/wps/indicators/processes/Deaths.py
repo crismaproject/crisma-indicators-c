@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-19 13:53:34 peter"
+Time-stamp: "2015-02-20 10:08:19 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -62,7 +62,11 @@ class Process(Indicator):
             identifier="Deaths", #the same as the file name
             version = "1.0",
             title="Number of fatalities",
-            abstract="Number of patients with health less than 20")
+            abstract="""Number of patients with health less than 20.
+
+indicator;Deaths;Number of fatalities;Number of patients with health less than 20;number
+kpi;Deaths;Number of fatalities;Number of patients with health less than 20;number
+""")
 
 
     def calculateIndicator(self):

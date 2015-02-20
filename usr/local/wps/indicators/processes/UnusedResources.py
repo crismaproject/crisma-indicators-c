@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-19 14:00:35 peter"
+Time-stamp: "2015-02-20 10:25:32 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -65,7 +65,12 @@ class Process(Indicator):
             identifier="UnusedResources", #the same as the file name
             version = "1.0",
             title="Number of resources not used",
-            abstract="Number of available resources that was not uned yet")
+            abstract="""Number of available resources that was not used yet.
+
+indicator;UnusedResources;Number of resources not used;Number of available resources that was not used yet;number
+kpi;UnusedResources;Number of resources not used;Number of available resources that was not used yet;number
+
+""")
 
     def calculateIndicator(self):
         self.status.set("Start collecting input data", 20)

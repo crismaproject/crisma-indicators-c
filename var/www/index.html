@@ -3,7 +3,7 @@
 /home/peter/public_html/wps/indicators.html
 Peter Kutschera, Wed Sep 11 12:43:30 2013$
 $Id$
-Time-stamp: "2015-02-13 12:20:24 peter"
+Time-stamp: "2015-02-20 11:37:09 peter"
 Peter.Kutschera@ait.ac.at   (AIT - Austrian Institute of Technology)
 -->
 
@@ -64,14 +64,28 @@ Peter.Kutschera@ait.ac.at   (AIT - Austrian Institute of Technology)
     <ol>
       <li> Request to indicator service (PyWPS in this case) to calculate an indicater for a particular ICMM WorldState.
       <li> To calculate the indicator input data is needed. But only the indicator service knows which one is needed for a particular indicator. So the indicator process asks ICMM for access to the storage of the actual needed input data (only OOI-WSR in the moment).
-      <li> The indicator value is calculated
-      <li> The indicator value is stored in OOI-WSR
-      <li> The reference to the value is stored in ICMM
-      <li> Model (WPS) returns URI to ICMM and the actual value. Both are only used for developement purposes since all requests for data will again go over ICMM as the central meta-information catalogue.
+      <li> Indicators and KPIs are calculated
+      <li> Indicators and KPIs are stored in ICMM
+      <li> Model (WPS) returns the actual values and URIs to one of the indicators and the KPIs. These are only used for developement purposes since all requests for data will again go over ICMM as the central meta-information catalogue.
     </ol>
 
     More details can be found in <a href="https://crisma-cat.ait.ac.at/component/lifeIndicator">the CRISMA catalogue</a>.
   </p>
+
+
+  <h3>Indicators and KPIs available from this WPS</h3>
+  <table class="table table-hover">
+    <tr><th>Process</th><th>Type</th><th>Identifier</th><th>Title</th><th>Abstract</th><th>Data-Type</th></tr>
+    <tr ng-repeat="desc in descriptionTable">
+      <td>{{desc[0]}}</td>
+      <td>{{desc[1]}}</td>
+      <td>{{desc[2]}}</td>
+      <td>{{desc[3]}}</td>
+      <td>{{desc[4]}}</td>
+      <td>{{desc[5]}}</td>
+    </tr>
+  </table>
+
 
   <h3>Access to the indicators (WPS):</h3>
 
