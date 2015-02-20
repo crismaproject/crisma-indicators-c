@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-20 10:24:01 peter"
+Time-stamp: "2015-02-20 11:50:53 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -128,7 +128,7 @@ indicator;PatientHealth;Patients health status summary;Number of patients with h
           'indicator' : {
             'id': self.identifier,
             'name': self.title,
-            'description': self.abstract,
+            'description': "Number of patients with health categorized in 3 groups",
             "worldstateDescription": self.worldstateDescription,
             'worldstates': [self.OOIworldstate.id],
             'type': "histogram",

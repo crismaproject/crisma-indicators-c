@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-20 10:11:55 peter"
+Time-stamp: "2015-02-20 11:48:45 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -62,7 +62,7 @@ class Process(Indicator):
             identifier="EffectiveResponse", #the same as the file name
             version = "1.0",
             title="Effective Response",
-            abstract="""Percent of patients already treated
+            abstract="""Percent of patients already treated.
 
 indicator;EffectiveResponse;Effective Response;Percent of patients already treated;number
 indicator;IneffectiveResponse;Inffective Response;Percent of patients not already treated;number
@@ -133,7 +133,7 @@ kpi;IneffectiveResponse;Inffective Response;Percent of patients not already trea
                 {
                     'id': self.identifier,
                     'name': self.title,
-                    'description': self.abstract,
+                    'description': "Percent of patients already treated",
                     "worldstateDescription": self.worldstateDescription,
                     "worldstates":[self.ICMMworldstate.id],
                     'type': "number",

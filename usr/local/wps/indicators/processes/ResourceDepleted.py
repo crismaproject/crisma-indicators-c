@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-20 10:25:17 peter"
+Time-stamp: "2015-02-20 11:51:18 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -113,7 +113,7 @@ kpi;ResourceDepleted;Number of depleted resources;Number of vehicles with respon
          'indicator': {
             'id': self.identifier,
             'name': self.title,
-            'description': self.abstract,
+            'description': "Number of vehicles with response capacity 20% or lower",
             "worldstateDescription": self.worldstateDescription,
             "worldstates":[self.ICMMworldstate.id],
             'type': "number",

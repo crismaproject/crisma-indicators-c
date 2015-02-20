@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-20 11:38:58 peter"
+Time-stamp: "2015-02-20 11:47:53 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -177,7 +177,7 @@ kpi;SeriouslyDeteriorated;Seriously deteriorated patients;Number of patients wit
                 {
                     'id': self.identifier,
                     'name': self.title,
-                    'description': self.abstract,
+                    'description': "Number of patients with actual health better or equal as at the beginning.",
                     "worldstateDescription": self.worldstateDescription,
                     'worldstates': [baseOOIworldstate.id, self.OOIworldstate.id],
                     'totalCount': totalCount,

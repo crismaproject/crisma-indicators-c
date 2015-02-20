@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-20 10:08:19 peter"
+Time-stamp: "2015-02-20 11:48:16 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -108,7 +108,7 @@ kpi;Deaths;Number of fatalities;Number of patients with health less than 20;numb
          'indicator': {
             'id': self.identifier,
             'name': self.title,
-            'description': self.abstract,
+            'description': "Number of patients with health less than 20.",
             "worldstateDescription": self.worldstateDescription,
             "worldstates":[self.ICMMworldstate.id],
             'type': "number",

@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-02-20 10:18:15 peter"
+Time-stamp: "2015-02-20 11:49:45 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -246,7 +246,7 @@ kpi;Evacuation;Evacuation completed;Minutes from start till last patient is evac
         indicators.insert(0, {
                 'id': self.identifier,
                 'name': self.title,
-                'description': self.abstract,
+                'description': "Evacuation start and end",
                 "worldstateDescription": self.worldstateDescription,
                 'worldstates': parents,
                 "type":"timeintervals",
