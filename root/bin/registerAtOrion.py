@@ -31,13 +31,14 @@ import time
 
 
 # The PubSub service-endpoint
-orion="http://{}:{}/".format (os.environ['ORION_PORT_1026_TCP_ADDR'], os.environ['ORION_PORT_1026_TCP_PORT'])
+#orion="http://{}:{}/".format (os.environ['ORION_PORT_1026_TCP_ADDR'], os.environ['ORION_PORT_1026_TCP_PORT'])
+orion=os.environ['ORION_ENDPOINT']
 
 # The listener (this script!) endpoint
 listener="http://{}/cgi-bin/OrionListener.py".format (os.environ['MYIP'])
 
 # the last registration id
-subscriptionIdFile = "/tmp/subscription.json"
+subscriptionIdFile = "/var/www/subscription.json"
 
 # if invoked as command: register as PubSub listener
 # Production use: set duration to 2 years (P2Y) instead of 5 minutes (PT5M) for short-term testing

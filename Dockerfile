@@ -1,7 +1,7 @@
 # 2014-11-04
 # Peter.Kutschera@ait.ac.at
 
-# docker build -t peterkutschera/crisma-indicator_c .
+# docker build -t peterkutschera/crisma-indicators-c .
 # docker run -P -d peterkutschera/crisma-indicator_c
 
 
@@ -43,6 +43,7 @@ WORKDIR /root
 
 COPY root/bin/runAll.sh /root/bin/runAll.sh
 COPY root/bin/registerAtOrion.py /root/bin/registerAtOrion.py
+COPY root/bin/registerAtOrion2.py /root/bin/registerAtOrion2.py
 RUN chmod +x /root/bin/*
 
 # CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
