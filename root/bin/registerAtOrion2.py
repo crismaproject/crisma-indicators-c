@@ -84,14 +84,18 @@ def subscribe():
         }
     params = {}
     headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-    response = requests.post("{}/NGSI10/subscribeContext".format (orion), data=json.dumps (data), params=params, headers=headers) 
-    subscription = response.json() if callable (response.json) else response.json
-    if ("subscribeError" in subscription):
+    try :
+        response = requests.post("{}/NGSI10/subscribeContext".format (orion), data=json.dumps (data), params=params, headers=headers) 
+        subscription = response.json() if callable (response.json) else response.json
+        if ("subscribeError" in subscription):
+            subscriptionId = None
+        else:
+            subscriptionId = subscription['subscribeResponse']['subscriptionId']
+        with io.open (subscriptionIdFile, "w") as f:
+            f.write (response.text)
+    except Exception, e:
+        logging.warning ("subscribe: %s", e)
         subscriptionId = None
-    else:
-        subscriptionId = subscription['subscribeResponse']['subscriptionId']
-    with io.open (subscriptionIdFile, "w") as f:
-        f.write (response.text)
     logging.info ("subscribe: %s", subscriptionId)
     return subscriptionId;
 
@@ -106,14 +110,18 @@ def updateSubscription(subscriptionId):
         }
     params = {}
     headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-    response = requests.post("{}/NGSI10/updateContextSubscription".format (orion), data=json.dumps (data), params=params, headers=headers) 
-    subscription = response.json() if callable (response.json) else response.json
-    if ("subscribeError" in subscription):
+    try:
+        response = requests.post("{}/NGSI10/updateContextSubscription".format (orion), data=json.dumps (data), params=params, headers=headers) 
+        subscription = response.json() if callable (response.json) else response.json
+        if ("subscribeError" in subscription):
+            subscriptionId = None
+        else:
+            subscriptionId = subscription['subscribeResponse']['subscriptionId']
+        with io.open (subscriptionIdFile, "w") as f:
+            f.write (response.text)
+    except Exception, e:
+        logging.warning ("subscribe: %s", e)
         subscriptionId = None
-    else:
-        subscriptionId = subscription['subscribeResponse']['subscriptionId']
-    with io.open (subscriptionIdFile, "w") as f:
-        f.write (response.text)
     logging.info ("updateSubscription: %s", subscriptionId)
     return subscriptionId;
 
