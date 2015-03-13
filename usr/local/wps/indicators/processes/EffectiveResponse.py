@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-02-20 11:48:45 peter"
+Time-stamp: "2015-03-13 11:23:04 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -50,9 +50,9 @@ from xml.sax.saxutils import escape
 import time
 import logging
 
-from Indicator import Indicator
-import ICMMtools as ICMM
-import OOItools as OOI
+from crisma.Indicator import Indicator
+import crisma.ICMMtools as ICMM
+import crisma.OOItools as OOI
 
 class Process(Indicator):
     def __init__(self):

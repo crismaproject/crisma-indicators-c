@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2014-11-27
-Time-stamp: "2015-02-19 14:00:08 peter"
+Time-stamp: "2015-03-13 11:32:10 peter"
 
 This is a base class for indcators holding all common code
 Includes basic handling of ICMM and OOI-WSR.
@@ -40,7 +40,7 @@ import OOItools as OOI
 
 class Indicator(WPSProcess):
 
-    def __init__(self, identifier, version, title, abstract):
+    def __init__(self, identifier, version, title, abstract, hasOOI = True):
         # init process
         WPSProcess.__init__(
             self,
@@ -70,7 +70,9 @@ class Indicator(WPSProcess):
         self.doUpdate = 1              # 1: recalculate existing indicator; 0: use existing value
         self.ICMMworldstate = None     # Access-object for ICMM WorldState
         self.worldstateDescription = None  # description of WorldState: ICMMname, ICMMdescription, ICMMworldstateURL, OOIworldstateURL
+        self.hasOOI = hasOOI           # Provide access to OOI
         self.OOIworldstate = None      # Access-object for OOI-WSR WorldState
+
     """
     def calculateIndicator(self):
         # create indicator value structure
@@ -97,7 +99,17 @@ class Indicator(WPSProcess):
         }
         return {indicator: indicatorData, kpi: kpiData}
     """
-                                           
+                 
+    def toMinutes (self, timedelta):
+        """Workaroud for missing total_seconds() in Python < 2.7"""
+        if hasattr(timedelta, 'total_seconds'):
+            duration = timedelta.total_seconds()
+        else: 
+            duration = (timedelta.microseconds + (timedelta.seconds +  timedelta.days * 24 * 3600) * 10**6) / 10**6
+        duration = duration / 60 
+        return duration
+
+                          
     def execute(self):
  
         self.status.set("Check ICMM WorldState status", 1)
@@ -117,17 +129,19 @@ class Indicator(WPSProcess):
         self.worldstateDescription = ICMM.getNameDescription (self.ICMMworldstate.id, baseUrl=self.ICMMworldstate.endpoint)
         self.worldstateDescription["ICMMworldstateURL"] = ICMMworldstateURL
 
-        OOIworldstateURL = ICMM.getOOIRef (self.ICMMworldstate.id, 'OOI-worldstate-ref', baseUrl=self.ICMMworldstate.endpoint)
-        logging.info ("OOIworldstateURL = {0}".format (OOIworldstateURL))
-        if (OOIworldstateURL is None):
-            return "invalid OOI URL: {0}".format (OOIworldstateURL)
-        self.worldstateDescription["OOIworldstateURL"] = OOIworldstateURL
+        # Not used / available in PilotEv1
+        if (self.hasOOI):
+            OOIworldstateURL = ICMM.getOOIRef (self.ICMMworldstate.id, 'OOI-worldstate-ref', baseUrl=self.ICMMworldstate.endpoint)
+            logging.info ("OOIworldstateURL = {0}".format (OOIworldstateURL))
+            if (OOIworldstateURL is None):
+                return "invalid OOI URL: {0}".format (OOIworldstateURL)
+            self.worldstateDescription["OOIworldstateURL"] = OOIworldstateURL
         
-        # OOI-URL -> Endpoint, id, ...
-        self.OOIworldstate = OOI.OOIAccess(OOIworldstateURL)
-        logging.info ("OOIWorldState = {0}".format (self.OOIworldstate))
-        if (self.OOIworldstate.endpoint is None):
-            return "invalid OOI ref: {0}".format (self.OOIworldstate)
+            # OOI-URL -> Endpoint, id, ...
+            self.OOIworldstate = OOI.OOIAccess(OOIworldstateURL)
+            logging.info ("OOIWorldState = {0}".format (self.OOIworldstate))
+            if (self.OOIworldstate.endpoint is None):
+                return "invalid OOI ref: {0}".format (self.OOIworldstate)
 
         self.status.set("Check if indicator value already exists", 10)
 
@@ -159,7 +173,7 @@ class Indicator(WPSProcess):
                     self.kpiRef.setValue(escape (ICMMkpiValueURL))
 
             except Exception, e:
-                logging.error ("calculateIndicator: {0}".format (str(e.args)))
+                logging.exception ("calculateIndicator: {0}".format (str(e.args)))
                 return ("calculateIndicator: {0}".format (str(e.args)))
         return
 

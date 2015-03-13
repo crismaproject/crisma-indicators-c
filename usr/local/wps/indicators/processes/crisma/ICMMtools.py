@@ -74,7 +74,7 @@ def getConstants (baseUrl=defaultBaseUrl, domain=defaultDomain):
         'class' : 'categories'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers, verify=False) 
     if response.status_code != 200:
         raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.raise_for_status()))
     # Depending on the requests-version json might be an field instead of on method
@@ -91,7 +91,7 @@ def getConstants (baseUrl=defaultBaseUrl, domain=defaultDomain):
         'fields' : 'id,name',
         'class' : 'datadescriptors'
         }
-    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers, verify=False) 
     if response.status_code != 200:
         raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.raise_for_status()))
     # Depending on the requests-version json might be an field instead of on method
@@ -115,7 +115,7 @@ def getId (clazz, baseUrl=defaultBaseUrl, domain=defaultDomain):
         'limit' :  999999999
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}".format (baseUrl, domain, clazz), params=params, headers=headers, verify=False) 
     # this was the request:
     # print response.url
 
@@ -151,7 +151,7 @@ def getNameDescription (wsid, baseUrl=defaultBaseUrl, domain=defaultDomain):
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -181,7 +181,7 @@ def getBaseWorldstate (wsid, baseCategory="Baseline", baseUrl=defaultBaseUrl, do
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -216,7 +216,7 @@ def getParentWorldstates (wsid, baseCategory="Baseline", baseUrl=defaultBaseUrl,
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -257,7 +257,7 @@ def getIndicatorURL (wsid, name, baseUrl=defaultBaseUrl, domain=defaultDomain):
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -301,7 +301,7 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -331,7 +331,7 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
                             }
                         # store dataitem back
                         params = {}
-                        response = requests.put(ICMMindicatorURL, params=params, headers=headers, data=json.dumps (data)) 
+                        response = requests.put(ICMMindicatorURL, params=params, headers=headers, data=json.dumps (data), verify=False) 
                         if response.status_code != 200:
                             raise Exception ("Error writing dataitem to ICMM at {0}: {1}".format (response.url, response.status_code))   
                         return ICMMindicatorURL    
@@ -370,7 +370,7 @@ def addIndicatorValToICMM (wsid, name, description, value, baseUrl=defaultBaseUr
 
     # store worldstate back
     params = {}
-    response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (ws)) 
+    response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (ws), verify=False) 
 
     # Check why ICMM is not always sending events
     logging.info ("AddIndicatorToICMM: PUT {0}/{1}.{2}/{3} -- DATA = {4}".format (baseUrl, domain, "worldstates", wsid, json.dumps (ws).replace ("\n", ""))) 
@@ -398,7 +398,7 @@ def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, dom
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -416,9 +416,13 @@ def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, dom
     icc = None
     # check if there is already a kpi in the ICMM worldstate
     if ('iccdata' in worldstate):
-        ICMMkpiURL = "{0}{1}".format (baseUrl, worldstate['iccdata']['$self'])
-        iccString = worldstate['iccdata']['actualaccessinfo']
-        icc = json.loads (iccString)
+        # if iccdata = []
+        if type (worldstate['iccdata']) is list:
+            pass
+        else:
+            ICMMkpiURL = "{0}{1}".format (baseUrl, worldstate['iccdata']['$self'])
+            iccString = worldstate['iccdata']['actualaccessinfo']
+            icc = json.loads (iccString)
 
     # now merge data into icc 
     logging.info ("    icc = {0}".format (icc))
@@ -451,19 +455,21 @@ def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, dom
             "actualaccessinfocontenttype": "application/json",
             "actualaccessinfo": json.dumps (icc)
             }
+        logging.info (json.dumps (data))
         ICMMkpiURL = "{0}{1}".format (baseUrl, data['$self'])
         logging.info ("ICMMkpiURL = {0}".format (ICMMkpiURL))
         # store dataitem back
         params = {}
-        response = requests.put(ICMMkpiURL, params=params, headers=headers, data=json.dumps (data)) 
+        response = requests.put(ICMMkpiURL, params=params, headers=headers, data=json.dumps (data), verify=False) 
         if response.status_code != 200:
+            logging.info (response.text)
             raise Exception ("Error writing dataitem to ICMM at {0}: {1}".format (response.url, response.status_code))   
         
         # update worldstate
         worldstate['iccdata'] = {
             '$ref': "/{0}.dataitems/{1}".format (domain, dataitemsId)
             }
-        response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (worldstate)) 
+        response = requests.put("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, data=json.dumps (worldstate), verify=False) 
         if response.status_code != 200:
             raise Exception ("Error updateing worldstate referencing new iccdata in ICMM at {0}: {1}".format (response.url, response.status_code))   
 
@@ -472,7 +478,7 @@ def addKpiValToICMM (wsid, name, description, value, baseUrl=defaultBaseUrl, dom
         worldstate['iccdata']['actualaccessinfo'] = json.dumps (icc)
         # store dataitem back
         params = {}
-        response = requests.put(ICMMkpiURL, params=params, headers=headers, data=json.dumps (worldstate['iccdata'])) 
+        response = requests.put(ICMMkpiURL, params=params, headers=headers, data=json.dumps (worldstate['iccdata']), verify=False) 
         if response.status_code != 200:
             raise Exception ("Error writing updated iccdata back to ICMM at {0}: {1}".format (response.url, response.status_code))   
 
@@ -498,7 +504,7 @@ def getOOIRef (wsid, category, name=None, baseUrl=defaultBaseUrl, domain=default
         'deduplicate' : 'false'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -544,7 +550,7 @@ def addIndicatorRefToICMM (wsid, name, description, ooiref, baseUrl=defaultBaseU
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (baseUrl, domain, "worldstates", wsid), params=params, headers=headers, verify=False) 
 
     if response.status_code != 200:
         raise Exception ("Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
@@ -623,7 +629,7 @@ def getCaptureData (worldstate):
         'deduplicate' : 'true'
         }
     headers = {'content-type': 'application/json'}
-    response = requests.get("{0}/{1}.{2}/{3}".format (worldstate.endpoint, worldstate.domain, "worldstates", worldstate.id), params=params, headers=headers) 
+    response = requests.get("{0}/{1}.{2}/{3}".format (worldstate.endpoint, worldstate.domain, "worldstates", worldstate.id), params=params, headers=headers, verify=False) 
     if response.status_code != 200:
         raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     # Depending on the requests-version json might be an field instead of on method
@@ -658,7 +664,7 @@ def getCaptureData (worldstate):
 
     params = {}
     headers = {'content-type': 'application/json'}
-    response = requests.get(captureDataURL, params=params, headers=headers) 
+    response = requests.get(captureDataURL, params=params, headers=headers, verify=False) 
     if response.status_code != 200:
         raise Exception ( "Error accessing ICMM at {0}: {1}".format (response.url, response.status_code))
     # Depending on the requests-version json might be an field instead of on method
