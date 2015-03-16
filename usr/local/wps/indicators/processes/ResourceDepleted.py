@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-03-13 11:22:34 peter"
+Time-stamp: "2015-03-16 12:44:40 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -71,6 +71,22 @@ kpi;ResourceDepleted;Number of depleted resources;Number of vehicles with respon
 
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+         'kpi': {
+           "resources": {
+             "displayName": "Resources",
+             "iconResource": "flower_16.png",
+             self.identifier: {
+                "displayName": self.title,
+                "iconResource": "flower_dead_16.png",
+                "value": -1,
+                "unit": "Vehicles"
+             }
+           }
+         }
+        }
+
         # calculate indicator value
         self.status.set("Start collecting input data", 20)
 
@@ -109,7 +125,7 @@ kpi;ResourceDepleted;Number of depleted resources;Number of vehicles with respon
         self.status.set("Calculated number: {0} out of totalCount: {1}".format (number, totalCount), 40)
         
         # create indicator value structure
-        result = {
+        self.result = {
          'indicator': {
             'id': self.identifier,
             'name': self.title,
@@ -133,4 +149,4 @@ kpi;ResourceDepleted;Number of depleted resources;Number of vehicles with respon
            }
          }
         }
-        return result
+        return

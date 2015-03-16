@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-03-13 11:24:12 peter"
+Time-stamp: "2015-03-16 12:42:58 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -73,6 +73,28 @@ kpi;SeriouslyDeteriorated;Seriously deteriorated patients;Number of patients wit
 """)
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+          'kpi': {
+                "casualties": {
+                    "displayName": "Casualties",
+                    "iconResource": "flower_16.png",
+                    self.identifier: {
+                        "displayName": self.title,
+                        "iconResource": "flower_dead_16.png",
+                        "value": -1,
+                        "unit": "People"
+                        },
+                    "SeriouslyDeteriorated": {
+                        "displayName": "Seriously deteriorated patients",
+                        "iconResource": "flower_dead_16.png",
+                        "value": -1,
+                        "unit": "People"
+                        }
+                    } 
+                }
+         }
+
         self.status.set("Start collecting input data", 20)
         # find base WorldState from ICMM
         baseICMMworldstateId = ICMM.getBaseWorldstate (self.ICMMworldstate.id, baseCategory="Baseline", baseUrl=self.ICMMworldstate.endpoint)
@@ -172,7 +194,7 @@ kpi;SeriouslyDeteriorated;Seriously deteriorated patients;Number of patients wit
         self.status.set("Calculated improvedIndicator for ICMM WorldState with id {0}: {1} out of {2}".format (self.ICMMworldstate.id, numberOfImproved, len (patients)), 90)
 
         # create indicator value structure
-        result = {
+        self.result = {
          'indicator': [
                 {
                     'id': self.identifier,
@@ -214,4 +236,4 @@ kpi;SeriouslyDeteriorated;Seriously deteriorated patients;Number of patients wit
                     } 
                 }
          }
-        return result
+        return

@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-03-13 11:22:49 peter"
+Time-stamp: "2015-03-16 12:38:10 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -70,6 +70,22 @@ kpi;Deaths;Number of fatalities;Number of patients with health less than 20;numb
 
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+         'kpi': {
+           "casualties": {
+             "displayName": "Casualties",
+             "iconResource": "flower_16.png",
+             self.identifier: {
+                "displayName": self.title,
+                "iconResource": "flower_dead_16.png",
+                "value": -1,
+                "unit": "People"
+             }
+           }
+         }
+        }
+
         # calculate indicator value
         self.status.set("Start collecting input data", 20)
 
@@ -104,7 +120,7 @@ kpi;Deaths;Number of fatalities;Number of patients with health less than 20;numb
         self.status.set("Calculated Deaths: {0}".format (numberOfDeaths), 40)
         
         # create indicator value structure
-        result = {
+        self.result = {
          'indicator': {
             'id': self.identifier,
             'name': self.title,
@@ -127,4 +143,4 @@ kpi;Deaths;Number of fatalities;Number of patients with health less than 20;numb
            }
          }
         }
-        return result
+        return 

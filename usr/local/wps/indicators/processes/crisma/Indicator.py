@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2014-11-27
-Time-stamp: "2015-03-13 11:32:10 peter"
+Time-stamp: "2015-03-16 11:17:18 peter"
 
 This is a base class for indcators holding all common code
 Includes basic handling of ICMM and OOI-WSR.
@@ -72,32 +72,54 @@ class Indicator(WPSProcess):
         self.worldstateDescription = None  # description of WorldState: ICMMname, ICMMdescription, ICMMworldstateURL, OOIworldstateURL
         self.hasOOI = hasOOI           # Provide access to OOI
         self.OOIworldstate = None      # Access-object for OOI-WSR WorldState
+        self.result = None             # to be filled from calcualteIndicators(self)
 
     """
     def calculateIndicator(self):
-        # create indicator value structure
-        indicatorData = {
-            'id': "newIndicator",
-            'name': "Newbies",
-            'description': "Some Number",
-            "worldstateDescription": self.worldstateDescription,
-            'type': "number",
-            'data': 42
-            }
-        # KPI
-        kpiData = {
-           "casualties": {
-             "displayName": "Casualties",
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+         'kpi': {
+           "Resources": {
+             "displayName": self.title,
              "iconResource": "flower_16.png",
-             "noOfDead": {
-                "displayName": "Number of dead",
+             self.identifier: {
+                "displayName": self.title,
                 "iconResource": "flower_dead_16.png",
-                "value": 257,
-                "unit": "People"
-             }, ...
-           }, ...
+                "value": -1,
+                "unit": "Resources"
+             }
+           }
+         }
         }
-        return {indicator: indicatorData, kpi: kpiData}
+        # calculate indicator values
+        # create indicator value structure
+        self.result = {
+         'indicator': [
+                {
+                    'id': self.identifier,
+                    'name': self.title,
+                    'description': "Number of available resources that was not used yet",
+                    "worldstateDescription": self.worldstateDescription,
+                    "worldstates": parents,
+                    'type': "number",
+                    'data': noUnused,
+                    'totalCount': noUnused + noUsed
+                    }
+                ],
+         'kpi': {
+           "Resources": {
+             "displayName": self.title,
+             "iconResource": "flower_16.png",
+             self.identifier: {
+                "displayName": self.title,
+                "iconResource": "flower_dead_16.png",
+                "value": noUnused,
+                "unit": "Resources"
+             }
+           }
+         }
+        }
+        return
     """
                  
     def toMinutes (self, timedelta):
@@ -152,28 +174,27 @@ class Indicator(WPSProcess):
 
         if ((self.doUpdate == 1) or (indicatorURL is None)):
             try:
-                data = self.calculateIndicator ()
-
-                if 'indicator' in data:
-                    logging.info ("indicatorData: {0}".format (json.dumps (data['indicator'])))
-                    self.indicator.setValue (json.dumps (data['indicator']))
-                    if isinstance(data['indicator'], list):
-                        for x in data['indicator']:
-                            ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, x['id'], x['name'], x, self.ICMMworldstate.endpoint)
-                            # only the last value will be used, sorry
-                            self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
-                    if isinstance(data['indicator'], dict):
-                        ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, data['indicator'], self.ICMMworldstate.endpoint)
-                        self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
-
-                if 'kpi' in data:
-                    logging.info ("kpiData: {0}".format (json.dumps (data['kpi'])))
-                    self.kpi.setValue (json.dumps (data['kpi']))
-                    ICMMkpiValueURL = ICMM.addKpiValToICMM (self.ICMMworldstate.id, self.identifier, self.title, data['kpi'], self.ICMMworldstate.endpoint)
-                    self.kpiRef.setValue(escape (ICMMkpiValueURL))
+                self.calculateIndicator ()
 
             except Exception, e:
                 logging.exception ("calculateIndicator: {0}".format (str(e.args)))
-                return ("calculateIndicator: {0}".format (str(e.args)))
+
+            if 'indicator' in self.result:
+                logging.info ("indicatorData: {0}".format (json.dumps (self.result['indicator'])))
+                self.indicator.setValue (json.dumps (self.result['indicator']))
+                if isinstance(self.result['indicator'], list):
+                    for x in self.result['indicator']:
+                        ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, x['id'], x['name'], x, self.ICMMworldstate.endpoint)
+                        # only the last value will be used, sorry
+                        self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
+                if isinstance(self.result['indicator'], dict):
+                    ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, self.result['indicator'], self.ICMMworldstate.endpoint)
+                    self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
+
+            if 'kpi' in self.result:
+                logging.info ("kpiData: {0}".format (json.dumps (self.result['kpi'])))
+                self.kpi.setValue (json.dumps (self.result['kpi']))
+                ICMMkpiValueURL = ICMM.addKpiValToICMM (self.ICMMworldstate.id, self.identifier, self.title, self.result['kpi'], self.ICMMworldstate.endpoint)
+                self.kpiRef.setValue(escape (ICMMkpiValueURL))
         return
 

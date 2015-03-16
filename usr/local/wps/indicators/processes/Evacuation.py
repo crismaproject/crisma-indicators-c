@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-03-13 11:23:34 peter"
+Time-stamp: "2015-03-16 12:58:14 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -94,6 +94,22 @@ kpi;Evacuation;Evacuation completed;Minutes from start till last patient is evac
         return dateutil.parser.parse (ts)
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+            'kpi': {
+                "delay": {
+                    "displayName": "Evacuation completed",
+                    "iconResource": "flower_16.png",
+                    self.identifier: {
+                        "displayName": self.title,
+                        "iconResource": "flower_dead_16.png",
+                        "value": -1,
+                        "unit": "Minutes"
+                        }
+                    } 
+                }
+            }
+        
         self.status.set("Start collecting input data", 20)
         # find base WorldState from ICMM
         parents = ICMM.getParentWorldstates (self.ICMMworldstate.id, baseCategory="Baseline", baseUrl=self.ICMMworldstate.endpoint)
@@ -188,7 +204,6 @@ kpi;Evacuation;Evacuation completed;Minutes from start till last patient is evac
                 t3.isoformat()), 90)
 
         # create indicator value structure
-        result = {}
         intervals = []
         indicators = []
         if t1 == None:
@@ -230,7 +245,7 @@ kpi;Evacuation;Evacuation completed;Minutes from start till last patient is evac
                         'type': "number",
                         'data': (t2 - t0).total_seconds() / 60
                         })
-                result['kpi'] = {
+                self.result['kpi'] = {
                     "delay": {
                         "displayName": "Evacuation completed",
                         "iconResource": "flower_16.png",
@@ -257,6 +272,6 @@ kpi;Evacuation;Evacuation completed;Minutes from start till last patient is evac
                     }
                 })
 
-        result['indicator'] = indicators;
-        return result
+        self.result['indicator'] = indicators;
+        return
 

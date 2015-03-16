@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-03-13 11:24:35 peter"
+Time-stamp: "2015-03-16 12:43:49 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -69,9 +69,10 @@ indicator;PatientHealth;Patients health status summary;Number of patients with h
 """)
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {}
         # calculate indicator value
         self.status.set("Start collecting input data", 20)
-
 
         # find out which pationts are part of the game
         IDsToSkip = []
@@ -124,7 +125,7 @@ indicator;PatientHealth;Patients health status summary;Number of patients with h
         self.status.set("Calculated PatientHealth: {0}".format (numberOfPatients), 40)
         
         # create indicator value structure
-        result = {
+        self.result = {
           'indicator' : {
             'id': self.identifier,
             'name': self.title,
@@ -167,4 +168,4 @@ indicator;PatientHealth;Patients health status summary;Number of patients with h
 #                    } 
                 }
           }
-        return result
+        return

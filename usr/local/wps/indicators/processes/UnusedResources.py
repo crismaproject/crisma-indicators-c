@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2013-09-11
-Time-stamp: "2015-03-13 11:25:24 peter"
+Time-stamp: "2015-03-16 12:46:04 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator
 
@@ -73,6 +73,22 @@ kpi;UnusedResources;Number of resources not used;Number of available resources t
 """)
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+         'kpi': {
+           "Resources": {
+             "displayName": self.title,
+             "iconResource": "flower_16.png",
+             self.identifier: {
+                "displayName": self.title,
+                "iconResource": "flower_dead_16.png",
+                "value": -1,
+                "unit": "Resources"
+             }
+           }
+         }
+        }
+
         self.status.set("Start collecting input data", 20)
         # find base WorldState from ICMM
         parents = ICMM.getParentWorldstates (self.ICMMworldstate.id, baseCategory="Baseline", baseUrl=self.ICMMworldstate.endpoint)
@@ -143,7 +159,7 @@ kpi;UnusedResources;Number of resources not used;Number of available resources t
         self.status.set("Calculated 'UnusedResources' indicator: Unavailable: {0}, Unused: {1}, Used: {2}".format (noUnavailable, noUnused, noUsed))
 
         # create indicator value structure
-        result = {
+        self.result = {
          'indicator': [
                 {
                     'id': self.identifier,
@@ -169,5 +185,5 @@ kpi;UnusedResources;Number of resources not used;Number of available resources t
            }
          }
         }
-        return result
+        return
 

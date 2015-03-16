@@ -1,7 +1,7 @@
 """
 Peter Kutschera, 2013-09-11
 Update to create KPI also, 2014-11-27
-Time-stamp: "2015-03-13 11:23:04 peter"
+Time-stamp: "2015-03-16 12:39:20 peter"
 
 The server gets an ICMM worldstate URL and calculates an indicator and an KPI from OOI-data
 
@@ -74,6 +74,28 @@ kpi;IneffectiveResponse;Inffective Response;Percent of patients not already trea
 
 
     def calculateIndicator(self):
+        # Define values to be used if indicator can not be calculated (e.g. missing input data)
+        self.result = {
+         'kpi': {
+           "Resources": {
+             "displayName": self.title,
+             "iconResource": "flower_16.png",
+             self.identifier: {
+                "displayName": self.title,
+                "iconResource": "flower_dead_16.png",
+                "value": -1,
+                "unit": "%"
+             },
+             "IneffectiveResponse": {
+                "displayName": "Ineffective response",
+                "iconResource": "flower_dead_16.png",
+                "value": -1,
+                "unit": "%"
+             }
+           }
+         }
+        }
+
         # calculate indicator value
         self.status.set("Start collecting input data", 20)
 
@@ -128,7 +150,7 @@ kpi;IneffectiveResponse;Inffective Response;Percent of patients not already trea
             number = 100 * number / totalCount
 
         # create indicator value structure
-        result = {
+        self.result = {
          'indicator': [
                 {
                     'id': self.identifier,
@@ -170,4 +192,4 @@ kpi;IneffectiveResponse;Inffective Response;Percent of patients not already trea
            }
          }
         }
-        return result
+        return
