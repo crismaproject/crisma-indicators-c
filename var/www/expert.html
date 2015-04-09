@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!--
+/home/peter/public_html/indicators/expert.html
+Peter Kutschera, Tue Apr  7 15:08:11 2015$
+$Id$
+Time-stamp: "2015-04-08 17:53:15 peter"
+Peter.Kutschera@ait.ac.at   (AIT - Austrian Institute of Technology)
+-->
+
+<!--
+    Copyright (C) 2014  AIT / Austrian Institute of Technology
+    http://www.ait.ac.at
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 2 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see http://www.gnu.org/licenses/gpl-2.0.html
+-->
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="Author" content="Peter.Kutschera@ait.ac.at">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indicators EXPERT test-page</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <script src="js/angular-1.2.13/angular.js"></script>
+  <script src="js/jquery-2.0.3.min.js"></script>
+  <script src="js/spin.min.js"></script>
+  <script src="js/jquery.spin.js"></script>
+  <script src="js/xml2json.min.js"></script>
+  <script src="libs/wpsControllers.js"></script>
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <style type="text/css">
+    <!--
+	.big { font-size:20pt }
+      -->
+  </style>
+</head>
+<body ng-app="wpsApp" ng-controller="wpsCtrl">
+<div class="container">
+  <H1><center>
+      <a href="http://www.crismaproject.eu/">CRISMA</a> Indicator EXPERT Test Page
+  </center></H1>
+  <hr>
+
+  <form class="form-horizontal" role="form">
+    
+    <div class="form-group">
+      <label for="wpsEndpoint">WPS endpoint:</label>
+      <input id="wpsEndpoint" class="form-control" type="url" ng-model="wpsEndpointTmp"></input> 
+      <label for="wpsEndpoint">ICMM endpoint:</label>
+      <input id="icmmEndpoint" class="form-control" type="url" ng-model="icmmEndpointTmp"></input> 
+      <button type="button" class="btn btn-default" ng-click="init()" >Start wich changed service endpoints</button>
+    </div>
+
+    <hr>
+
+    <div class="form-group">
+      <label for="iselect">Select process(es) to use:</label>
+      <div  id="iselect" ng-repeat="indi in indicators">
+	<input type="checkbox"class="form-control" ng-model="indicatorsSelected[indi]" ng-change="setProcessesToExecute()">{{indi}}</input>
+      </div>
+<!--
+      <div ng-repeat="indi in indicators">
+	indicatorsSelected[{{indi}}] = {{indicatorsSelected[indi]}}
+      </div>
+-->
+    </div>
+
+
+    <div class="form-group">
+      <label for="wsselect">Worldstate - Options:</label>
+      <div>
+	<input type="radio" class="form-control" ng-model="worldstateOptionSelected" value="Single" ng-change="loadNoWorldstates()">Single</input>
+	<input id="wsSingle" class="form-control" type="url" ng-model="worldstateUrl" ng-change="setWorldstatesToExecute()"></input> 
+	<br/>
+	
+	<input type="radio" class="form-control" ng-model="worldstateOptionSelected" value="Baseline" ng-change="loadBaseWorldstates()">Baseline (Use the whole tree)</input>
+	<select id="wsBaseline" class="form-control" ng-model="worldstateUrlBaseline" ng-options="ws for ws in worldstateURLsBaseline" ng-change="setWorldstatesToExecute()"></select>
+	<br/>
+	
+	<input type="radio" class="form-control" ng-model="worldstateOptionSelected" value="Leaf" ng-change="loadLeafWorldstates()">Leaf</input>
+	<select id="wsLeaf" class="form-control" ng-model="worldstateUrlLeaf" ng-options="ws for ws in worldstateURLsLeaf" ng-change="setWorldstatesToExecute()"></select>
+	<br/>
+      </div>
+    </div>
+    
+      
+    
+    <div class="form-group">
+      <button type="button" class="btn btn-default" ng-click="executeAll()" ng-disabled="processesToExecute.length == 0">Execute the selected process(es) with the given ICMM worldstate URL(s) as parameter</button>
+    </div>
+    
+  </form>
+  
+
+
+  <h3>Results</h3>
+  <table class="table table-hover">
+    <tr><th>Worldstate</th>
+      <th ng-repeat="process in processesToExecute">{{process}}</th>
+    </tr>
+    <tr ng-repeat="ws in worldstatesToExecute">
+      <td>{{ws}}</td>
+      <td ng-repeat="process in processesToExecute">{{results[ws][process]}}</td>
+    </tr>
+  </table>
+
+
+
+  <hr>
+  <p>
+    The <a href="wps/pywps.log" target="WPS-logfile">WPS logfile</a>,
+    the PubSub <a href="orion.log" target="WPS-orion-log">registration's logfile</a>
+    and the PubSub <a href="subscription.json" target="WPS-PubSub-registration">subscription response</a>
+  </p>
+  <a href='http://www.ait.ac.at/meta-menu/impressum/' title='Impressum', target="Impressum">Impressum</a>
+  <p>
+    <div style="font-size:12px;">
+      Last update: <a href="mailto:Peter.Kutschera@ait.ac.at">Peter Kutschera</a>, Seibersdorf, 2014-03-21
+    </div>
+  </p>
+
+</div>
+</body>
+</html>
+
+

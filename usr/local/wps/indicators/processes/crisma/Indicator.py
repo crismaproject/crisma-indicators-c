@@ -1,6 +1,6 @@
 """
 Peter Kutschera, 2014-11-27
-Time-stamp: "2015-03-16 11:17:18 peter"
+Time-stamp: "2015-04-09 08:45:37 peter"
 
 This is a base class for indcators holding all common code
 Includes basic handling of ICMM and OOI-WSR.
@@ -66,6 +66,9 @@ class Indicator(WPSProcess):
         self.kpi=self.addLiteralOutput(identifier = "kpi",
                                        type = type (""),
                                        title = "kpi value")
+        self.statusmessage=self.addLiteralOutput(identifier = "statusmessage",
+                                       type = type (""),
+                                       title = "execution status")
         # for ICMM and OOI
         self.doUpdate = 1              # 1: recalculate existing indicator; 0: use existing value
         self.ICMMworldstate = None     # Access-object for ICMM WorldState
@@ -175,26 +178,42 @@ class Indicator(WPSProcess):
         if ((self.doUpdate == 1) or (indicatorURL is None)):
             try:
                 self.calculateIndicator ()
+                self.statusmessage.setValue ("OK")
 
             except Exception, e:
                 logging.exception ("calculateIndicator: {0}".format (str(e.args)))
+                self.statusmessage.setValue ("calculateIndicator: {0}".format (str(e.args)))
+                self.status.set("save result: {0}".format (str(e.args)))
 
-            if 'indicator' in self.result:
-                logging.info ("indicatorData: {0}".format (json.dumps (self.result['indicator'])))
-                self.indicator.setValue (json.dumps (self.result['indicator']))
-                if isinstance(self.result['indicator'], list):
-                    for x in self.result['indicator']:
-                        ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, x['id'], x['name'], x, self.ICMMworldstate.endpoint)
-                        # only the last value will be used, sorry
+            try:
+                if 'indicator' in self.result:
+                    logging.info ("indicatorData: {0}".format (json.dumps (self.result['indicator'])))
+                    self.indicator.setValue (json.dumps (self.result['indicator']))
+                    if isinstance(self.result['indicator'], list):
+                        for x in self.result['indicator']:
+                            ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, x['id'], x['name'], x, self.ICMMworldstate.endpoint)
+                            # only the last value will be used, sorry
+                            self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
+                    if isinstance(self.result['indicator'], dict):
+                        ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, self.result['indicator'], self.ICMMworldstate.endpoint)
                         self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
-                if isinstance(self.result['indicator'], dict):
-                    ICMMindicatorValueURL = ICMM.addIndicatorValToICMM (self.ICMMworldstate.id, self.identifier, self.title, self.result['indicator'], self.ICMMworldstate.endpoint)
-                    self.indicatorRef.setValue(escape (ICMMindicatorValueURL))
 
-            if 'kpi' in self.result:
-                logging.info ("kpiData: {0}".format (json.dumps (self.result['kpi'])))
-                self.kpi.setValue (json.dumps (self.result['kpi']))
-                ICMMkpiValueURL = ICMM.addKpiValToICMM (self.ICMMworldstate.id, self.identifier, self.title, self.result['kpi'], self.ICMMworldstate.endpoint)
-                self.kpiRef.setValue(escape (ICMMkpiValueURL))
+                if 'kpi' in self.result:
+                    logging.info ("kpiData: {0}".format (json.dumps (self.result['kpi'])))
+                    self.kpi.setValue (json.dumps (self.result['kpi']))
+                    ICMMkpiValueURL = ICMM.addKpiValToICMM (self.ICMMworldstate.id, self.identifier, self.title, self.result['kpi'], self.ICMMworldstate.endpoint)
+                    self.kpiRef.setValue(escape (ICMMkpiValueURL))
+
+                self.statusmessage.setValue ("OK")
+                self.status.set ("OK")
+                
+            except Exception, e:
+                logging.exception ("save result: {0}".format (str(e.args)))
+                self.statusmessage.setValue ("save result: {0}".format (str(e.args)))
+                self.status.set("save result: {0}".format (str(e.args)))
+        else:
+            self.statusmessage.setValue ("OK, indicator already exists")
+            self.status.set ("OK, indicator already exists")
+
         return
 
